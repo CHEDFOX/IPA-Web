@@ -5,10 +5,13 @@ const trim = (url: string) => url.replace(/\/+$/, '');
 
 /** Backend address the browser uses (enquiry form). */
 export const PUBLIC_API_URL = trim(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000');
-/** Backend address the server uses; can be a private address on the same machine. */
-const SERVER_API_URL = trim(process.env.API_INTERNAL_URL || PUBLIC_API_URL);
-/** This website's public address. */
-export const SITE_URL = trim(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000');
+/** Backend address the server uses. */
+const SERVER_API_URL = PUBLIC_API_URL;
+/** This website's public address. On Vercel it defaults to the project's production domain. */
+export const SITE_URL = trim(
+  process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000'),
+);
 
 /** Every cached request carries this tag; the backend's refresh call clears them all. */
 export const CACHE_TAG = 'ipa';

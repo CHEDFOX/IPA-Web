@@ -1,9 +1,9 @@
 # IPA Web
 
 The public website for the IPA real estate & land portfolio: a photo-first showcase that is quick
-to share with clients. Listings, photos, videos and contact details all come from
-[IPA-Backend](https://github.com/CHEDFOX/IPA-Backend), which runs on your VPS. You manage
-everything from its admin panel; this site has nothing to edit.
+to share with clients. It is hosted on **Vercel**. Listings, photos, videos and contact details all
+come from [IPA-Backend](https://github.com/CHEDFOX/IPA-Backend), which runs on your VPS. You manage
+everything from the backend's admin panel; this site has nothing to edit.
 
 ## What's on the site
 
@@ -19,8 +19,36 @@ everything from its admin panel; this site has nothing to edit.
 - **QR codes** for every property (`/properties/<name>/qr`), for signboards and flyers.
 - `sitemap.xml` and `robots.txt` for search engines.
 
-Built with Next.js 16 (App Router, Cache Components). Pages are cached and refreshed within
-seconds when the backend reports a change, or every few minutes otherwise.
+Built with Next.js 16 (App Router, Cache Components). Pages are cached and refresh within seconds
+when the backend reports a change, or every minute otherwise.
+
+## Deploy on Vercel
+
+Set up the backend on your VPS first (see the backend's [DEPLOY.md](https://github.com/CHEDFOX/IPA-Backend/blob/HEAD/DEPLOY.md)), so the first build has
+your listings.
+
+1. **Import the project**: vercel.com → Add New → Project → import `CHEDFOX/IPA-Web`.
+   Vercel detects Next.js; leave the build settings as they are.
+2. **Environment variables** (same screen, or later under Settings → Environment Variables):
+
+   | Name | Value |
+   | --- | --- |
+   | `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com` (your backend) |
+   | `NEXT_PUBLIC_SITE_URL` | `https://yourdomain.com` (or leave it out until your domain is connected; the `*.vercel.app` address is used meanwhile) |
+   | `REVALIDATE_SECRET` | the same long random string as in the backend's `.env` |
+
+3. **Deploy**. The build stops with a clear message if `NEXT_PUBLIC_API_URL` is missing.
+4. **Domain**: Settings → Domains → add `yourdomain.com` (and `www.yourdomain.com`), then create the
+   DNS records Vercel shows you. Keep the `api` record pointing at your VPS.
+5. **Function region**: Settings → Functions → choose the region closest to your VPS, so the site
+   talks to the backend quickly.
+6. **Redeploy** after changing environment variables (Deployments → ⋯ → Redeploy).
+
+> **Plan:** Vercel's free Hobby plan is for personal, non-commercial use only. A site promoting a
+> business counts as commercial, so use the **Pro** plan for the live site.
+
+Every push to the production branch (the default branch; see Settings → Git) deploys automatically;
+other branches get preview addresses.
 
 ## Run it locally
 
@@ -32,41 +60,8 @@ cp .env.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:4000, NEXT
 npm run dev                    # http://localhost:3000
 ```
 
-Checks: `npm run lint` and `npm run typecheck`.
+Checks: `npm run lint` and `npm run typecheck`. `npm run build && npm start` runs a production
+build locally.
 
-## Settings
-
-| Variable | What it does |
-| --- | --- |
-| `NEXT_PUBLIC_API_URL` | The backend's public address, e.g. `https://api.yourdomain.com`. |
-| `API_INTERNAL_URL` | Optional faster address for server-side requests when both run on the same VPS, e.g. `http://127.0.0.1:4000`. |
-| `NEXT_PUBLIC_SITE_URL` | This site's public address (link previews, QR codes, sitemap). |
-| `REVALIDATE_SECRET` | Same value as the backend's `REVALIDATE_SECRET`, so edits show straight away. |
-
-## Deploy
-
-### Option A — Vercel (free, easiest)
-
-1. Import the `IPA-Web` repository at vercel.com/new.
-2. Add the four settings above under Environment Variables.
-3. Deploy, then add your domain (e.g. `yourdomain.com`) in the project's Domains tab.
-4. In the backend's `.env`, set `SITE_URL=https://yourdomain.com` and
-   `WEB_REVALIDATE_URL=https://yourdomain.com/api/revalidate`.
-
-### Option B — on the same VPS as the backend
-
-```bash
-git clone https://github.com/CHEDFOX/IPA-Web.git /opt/ipa-web
-cd /opt/ipa-web
-cp .env.example .env.production && nano .env.production
-npm ci && npm run build
-PORT=3000 npm start          # keep it running with systemd or pm2
-```
-
-`npm run build` creates a self-contained server in `.next/standalone` and copies the static
-files and `.env.production` next to it; `npm start` runs it. Proxy `yourdomain.com` to
-`127.0.0.1:3000` with nginx or Caddy, the same way as the backend, with response buffering
-off so pages can stream (`proxy_buffering off;` in nginx).
-
-If the backend is not reachable while you build, the build still succeeds: pages start empty
-and fill in within a minute once the backend answers.
+If the backend is unreachable during a build, the build still succeeds: pages start empty and
+fill in within a minute once the backend answers.
