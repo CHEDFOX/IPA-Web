@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { fill, type Dictionary } from '@/lib/i18n';
 import type { GalleryItem, ImageSet } from '@/lib/types';
 import { formatDuration } from '@/lib/format';
 import { ChevronLeft, ChevronRight, Close, Photos, Play } from './Icons';
@@ -14,12 +15,15 @@ function Thumb({ item, sizes, priority }: { item: GalleryItem; sizes: string; pr
   return set ? <Picture image={set} alt="" sizes={sizes} priority={priority} /> : null;
 }
 
+type Labels = Dictionary['property'];
+
 interface Props {
   items: GalleryItem[];
   title: string;
+  labels: Labels;
 }
 
-export function Gallery({ items, title }: Props) {
+export function Gallery({ items, title, labels }: Props) {
   const [open, setOpen] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const touchX = useRef<number | null>(null);
@@ -35,7 +39,7 @@ export function Gallery({ items, title }: Props) {
     return (
       <div className="gallery">
         <div className="gallery-main gallery-tile single">
-          <span className="no-photo">Photos coming soon</span>
+          <span className="no-photo">{labels.photosSoon}</span>
         </div>
       </div>
     );
@@ -53,7 +57,7 @@ export function Gallery({ items, title }: Props) {
   const current = open === null ? null : items[open];
 
   const tileLabel = (item: GalleryItem, n: number) =>
-    item.kind === 'video' ? `Play video of ${title}` : `Open photo ${n} of ${title}`;
+    item.kind === 'video' ? fill(labels.playVideo, { title }) : fill(labels.openPhoto, { n, title });
 
   return (
     <>
@@ -68,7 +72,7 @@ export function Gallery({ items, title }: Props) {
             )}
             {!side.length && items.length > 1 && (
               <span className="media-chip right">
-                <Photos /> All {items.length}
+                <Photos /> {fill(labels.allItems, { n: items.length })}
               </span>
             )}
           </button>
@@ -83,7 +87,7 @@ export function Gallery({ items, title }: Props) {
                   type="button"
                   className="gallery-tile"
                   onClick={() => show(item)}
-                  aria-label={isLast && items.length > 3 ? `Show all ${items.length} photos and videos` : tileLabel(item, items.indexOf(item) + 1)}
+                  aria-label={isLast && items.length > 3 ? fill(labels.showAll, { n: items.length }) : tileLabel(item, items.indexOf(item) + 1)}
                 >
                   <Thumb item={item} sizes="(max-width: 860px) 50vw, 33vw" />
                   {item.kind === 'video' && (
@@ -91,12 +95,15 @@ export function Gallery({ items, title }: Props) {
                       <span className="play">
                         <Play size={22} />
                       </span>
-                      <span className="media-chip left">Video{item.duration ? ` · ${formatDuration(item.duration)}` : ''}</span>
+                      <span className="media-chip left">
+                        {labels.video}
+                        {item.duration ? ` · ${formatDuration(item.duration)}` : ''}
+                      </span>
                     </>
                   )}
                   {isLast && items.length > 3 && (
                     <span className="media-chip right">
-                      <Photos /> {photoCount === items.length ? `All ${items.length} photos` : `All ${items.length}`}
+                      <Photos /> {fill(photoCount === items.length ? labels.allPhotos : labels.allItems, { n: items.length })}
                     </span>
                   )}
                 </button>
@@ -109,7 +116,7 @@ export function Gallery({ items, title }: Props) {
       <dialog
         ref={dialog}
         className="lightbox"
-        aria-label={`${title} photos`}
+        aria-label={fill(labels.photos, { title })}
         onClose={() => setOpen(null)}
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight') step(1);
@@ -131,7 +138,7 @@ export function Gallery({ items, title }: Props) {
               <span className="lightbox-count">
                 {open! + 1} / {items.length}
               </span>
-              <button type="button" className="icon-btn" onClick={() => setOpen(null)} aria-label="Close">
+              <button type="button" className="icon-btn" onClick={() => setOpen(null)} aria-label={labels.close}>
                 <Close size={20} />
               </button>
             </div>
@@ -146,15 +153,15 @@ export function Gallery({ items, title }: Props) {
                 preload="metadata"
               />
             ) : (
-              <img key={current.id} src={largest(current)} alt={current.alt || `${title}, photo ${open! + 1}`} />
+              <img key={current.id} src={largest(current)} alt={current.alt || fill(labels.photoAlt, { title, n: open! + 1 })} />
             )}
             {current.alt && <p className="lightbox-caption">{current.alt}</p>}
             {items.length > 1 && (
               <>
-                <button type="button" className="icon-btn lightbox-prev" onClick={() => step(-1)} aria-label="Previous">
+                <button type="button" className="icon-btn lightbox-prev" onClick={() => step(-1)} aria-label={labels.previous}>
                   <ChevronLeft size={22} />
                 </button>
-                <button type="button" className="icon-btn lightbox-next" onClick={() => step(1)} aria-label="Next">
+                <button type="button" className="icon-btn lightbox-next" onClick={() => step(1)} aria-label={labels.next}>
                   <ChevronRight size={22} />
                 </button>
               </>
@@ -167,11 +174,11 @@ export function Gallery({ items, title }: Props) {
 }
 
 /** A single image (e.g. a site plan) that opens full screen when clicked. */
-export function ZoomImage({ image, alt, caption }: { image: ImageSet; alt: string; caption?: string }) {
+export function ZoomImage({ image, alt, caption, labels }: { image: ImageSet; alt: string; caption?: string; labels: Labels }) {
   const dialog = useRef<HTMLDialogElement>(null);
   return (
     <figure className="plan">
-      <button type="button" onClick={() => dialog.current?.showModal()} aria-label={`Enlarge: ${alt}`}>
+      <button type="button" onClick={() => dialog.current?.showModal()} aria-label={fill(labels.enlarge, { alt })}>
         <Picture image={image} alt={alt} sizes="(max-width: 860px) 100vw, 860px" />
       </button>
       {caption && <figcaption>{caption}</figcaption>}
@@ -179,7 +186,7 @@ export function ZoomImage({ image, alt, caption }: { image: ImageSet; alt: strin
         <div className="lightbox-inner">
           <div className="lightbox-bar">
             <span />
-            <button type="button" className="icon-btn" onClick={() => dialog.current?.close()} aria-label="Close">
+            <button type="button" className="icon-btn" onClick={() => dialog.current?.close()} aria-label={labels.close}>
               <Close size={20} />
             </button>
           </div>

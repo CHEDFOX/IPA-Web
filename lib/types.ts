@@ -3,7 +3,7 @@
 export type PropertyType = 'land' | 'residential' | 'commercial';
 export type PropertyStatus = 'available' | 'under_offer' | 'sold';
 export type Visibility = 'public' | 'unlisted' | 'draft';
-export type AreaUnit = 'm2' | 'ha' | 'acre' | 'sqft';
+export type AreaUnit = 'm2' | 'ha' | 'acre' | 'sqft' | 'sqyd' | 'bigha';
 
 export interface ImageSize {
   url: string;
@@ -54,14 +54,18 @@ export interface Cover extends ImageSet {
   height: number | null;
 }
 
+// Hindi fields are optional: older backends don't send them, and empty means "use English".
 export interface DetailRow {
   label: string;
   value: string;
+  labelHi?: string;
+  valueHi?: string;
   key: boolean;
 }
 
 export interface NearbyRow {
   place: string;
+  placeHi?: string;
   distance: string;
 }
 
@@ -69,6 +73,7 @@ export interface PropertyCard {
   id: number;
   slug: string;
   title: string;
+  titleHi?: string;
   type: PropertyType;
   status: PropertyStatus;
   visibility: Visibility;
@@ -76,11 +81,13 @@ export interface PropertyCard {
   price: number | null;
   priceNote: string;
   location: string;
+  locationHi?: string;
   area: number | null;
   areaUnit: AreaUnit;
   bedrooms: number | null;
   bathrooms: number | null;
   summary: string;
+  summaryHi?: string;
   updatedAt: string;
   cover: Cover | null;
   photoCount: number;
@@ -89,9 +96,11 @@ export interface PropertyCard {
 
 export interface Property extends Omit<PropertyCard, 'photoCount' | 'videoCount'> {
   address: string;
+  addressHi?: string;
   latitude: number | null;
   longitude: number | null;
   description: string;
+  descriptionHi?: string;
   details: DetailRow[];
   nearby: NearbyRow[];
   gallery: GalleryItem[];
@@ -117,6 +126,16 @@ export interface Settings {
   instagram: string;
   facebook: string;
   footerNote: string;
+  siteNameHi?: string;
+  taglineHi?: string;
+  heroTitleHi?: string;
+  heroTextHi?: string;
+  aboutTitleHi?: string;
+  aboutTextHi?: string;
+  contactTitleHi?: string;
+  contactTextHi?: string;
+  addressHi?: string;
+  footerNoteHi?: string;
 }
 
 export interface Site {

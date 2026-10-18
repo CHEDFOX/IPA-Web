@@ -17,7 +17,13 @@ everything from the backend's admin panel; this site has nothing to edit.
 - **Link previews**: each property has its own title, description and 1200×630 photo, so links
   look right when pasted into WhatsApp, iMessage, Facebook, LinkedIn and so on.
 - **QR codes** for every property (`/properties/<name>/qr`), for signboards and flyers.
-- `sitemap.xml` and `robots.txt` for search engines.
+- **Locations**: Google Maps with map and satellite views, plus buttons for Google Maps, Google
+  Earth and directions to the exact coordinates, which visitors can also copy.
+- **English and Hindi**: English at the usual addresses, Hindi under `/hi` (e.g.
+  `/hi/properties/<name>`), with a हिन्दी / English switch in the header. Buttons and labels are
+  translated in `lib/i18n.ts`; listing text uses the Hindi boxes in the admin panel and falls back
+  to English when they are empty. Prices in rupees show as lakh / crore.
+- `sitemap.xml` (both languages) and `robots.txt` for search engines.
 
 Built with Next.js 16 (App Router, Cache Components). Pages are cached and refresh within seconds
 when the backend reports a change, or every minute otherwise.

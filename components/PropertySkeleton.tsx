@@ -1,7 +1,7 @@
 /** Shown for a moment while a property that was not prebuilt loads for the first time. */
-export function PropertySkeleton() {
+export function PropertySkeleton({ label }: { label: string }) {
   return (
-    <div className="wrap" aria-busy="true" aria-label="Loading property">
+    <div className="wrap" aria-busy="true" aria-label={label}>
       <div className="skeleton skeleton-line" />
       <div className="skeleton skeleton-title" />
       <div className="gallery">
