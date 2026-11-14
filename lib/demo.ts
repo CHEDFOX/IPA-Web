@@ -86,6 +86,12 @@ const villa = [
   photo('villa-gachibowli', '6', W.large, 'Main bathroom'),
 ];
 
+const deogarh = [
+  photo('lakeside-deogarh', '1', W.full, 'Evening over the fields, with the Aravalli ridge behind'),
+  photo('lakeside-deogarh', '2', W.full, 'Standing crop on the plot, rocky hillside beyond'),
+  photo('lakeside-deogarh', '3', [640, 1280, 1618], 'Mustard in flower on the neighbouring plots'),
+];
+
 const office = [
   photo('office-floor-hitec-city', '1', W.large, 'The building from the street'),
   photo('office-floor-hitec-city', '2', W.large, 'Glass facade and entrance'),
@@ -290,6 +296,55 @@ const DEMO_PROPERTIES: Property[] = [
     createdAt: '2026-07-14T10:10:00.000Z',
   },
   {
+    id: 6,
+    slug: 'lakeside-deogarh',
+    title: 'Lakeside farmland, Deogarh',
+    titleHi: 'देवगढ़ में झील किनारे खेती की ज़मीन',
+    type: 'land',
+    status: 'available',
+    visibility: 'public',
+    featured: true,
+    price: 11_800_000,
+    priceNote: 'Per bigha rate on request',
+    location: 'Deogarh',
+    locationHi: 'देवगढ़',
+    area: 3.1,
+    areaUnit: 'ha',
+    bedrooms: null,
+    bathrooms: null,
+    summary:
+      'Open farmland on the Sangrampura road, 300 m from the lake and two kilometres north of Deogarh town, with the Aravalli ridge on the skyline.',
+    summaryHi:
+      'संग्रामपुरा रोड पर खुली खेती की ज़मीन — झील से 300 मीटर और देवगढ़ कस्बे से दो किलोमीटर उत्तर, क्षितिज पर अरावली की पहाड़ियाँ।',
+    address: 'Sangrampura, Deogarh tehsil, Rajsamand district, Rajasthan 313331',
+    addressHi: 'संग्रामपुरा, देवगढ़ तहसील, राजसमंद ज़िला, राजस्थान 313331',
+    latitude: 25.5429104,
+    longitude: 73.917688,
+    description:
+      'Three and a bit hectares of level cultivated land on the metalled road that runs north from Deogarh to Sangrampura, in a belt of working farm plots between the town and the lake.\n\nThe water body lies about 300 m east, so the water table here is kinder than on the higher ground west of the road; the plot is under crop today and has an open well in the north-east corner. The Aravalli ridge closes the view on three sides.\n\nDeogarh town, with its school, bank and hospital, is two kilometres south, and the state highway through the town carries on to Bhim and to Rajsamand.',
+    descriptionHi:
+      'देवगढ़ से संग्रामपुरा जाने वाली पक्की सड़क पर तीन हेक्टेयर से कुछ अधिक समतल खेती की ज़मीन — कस्बे और झील के बीच खेतों की पट्टी में।\n\nपानी लगभग 300 मीटर पूर्व में है, इसलिए यहाँ जलस्तर सड़क के पश्चिम की ऊँची ज़मीन से बेहतर है; प्लॉट अभी फ़सल में है और उत्तर-पूर्व कोने पर खुला कुआँ है। तीन ओर अरावली की पहाड़ियाँ दिखती हैं।\n\nदेवगढ़ कस्बा — स्कूल, बैंक और अस्पताल के साथ — दो किलोमीटर दक्षिण में है, और कस्बे से गुज़रता स्टेट हाईवे भीम और राजसमंद तक जाता है।',
+    details: [
+      { label: 'Road', value: 'Metalled village road at the front', labelHi: 'सड़क', valueHi: 'सामने पक्की गाँव सड़क', key: true },
+      { label: 'Water', value: 'Open well; lake 300 m east', labelHi: 'पानी', valueHi: 'खुला कुआँ; झील 300 मीटर पूर्व', key: true },
+      { label: 'Terrain', value: 'Level, under crop', labelHi: 'ज़मीन', valueHi: 'समतल, फ़सल में', key: true },
+      { label: 'Tehsil', value: 'Deogarh, Rajsamand district', labelHi: 'तहसील', valueHi: 'देवगढ़, राजसमंद ज़िला', key: false },
+      { label: 'Electricity', value: 'Line along the road', labelHi: 'बिजली', valueHi: 'सड़क के साथ लाइन', key: false },
+    ],
+    nearby: [
+      { place: 'Lake', placeHi: 'झील', distance: '300 m' },
+      { place: 'Sangrampura', placeHi: 'संग्रामपुरा', distance: '700 m' },
+      { place: 'Deogarh town', placeHi: 'देवगढ़ कस्बा', distance: '2 km' },
+      { place: 'Hospital', placeHi: 'अस्पताल', distance: '1.2 km' },
+    ],
+    gallery: deogarh,
+    plan: null,
+    brochure: null,
+    cover: cover(deogarh[0]),
+    updatedAt: '2026-11-14T10:30:00.000Z',
+    createdAt: '2026-11-14T10:30:00.000Z',
+  },
+  {
     id: 5,
     slug: 'orchard-plot-shamshabad',
     title: 'Orchard plot near Shamshabad',
@@ -355,15 +410,15 @@ const DEMO_SITE: Site = {
     heroTitle: 'Land you can walk before you buy.',
     heroTitleHi: 'ख़रीदने से पहले ज़मीन पर चलकर देखिए।',
     heroText:
-      'Farmland, plots, homes and commercial space around Warangal and Hyderabad — photographed, measured and mapped, so you know what you are visiting.',
+      'Farmland, plots, homes and commercial space around Warangal, Hyderabad and Deogarh — photographed, measured and mapped, so you know what you are visiting.',
     heroTextHi:
-      'वारंगल और हैदराबाद के आसपास खेती की ज़मीन, प्लॉट, मकान और कमर्शियल जगह — फ़ोटो, नाप और नक्शे के साथ, ताकि आपको पहले से पता हो कि आप क्या देखने जा रहे हैं।',
+      'वारंगल, हैदराबाद और देवगढ़ के आसपास खेती की ज़मीन, प्लॉट, मकान और कमर्शियल जगह — फ़ोटो, नाप और नक्शे के साथ, ताकि आपको पहले से पता हो कि आप क्या देखने जा रहे हैं।',
     aboutTitle: 'About IPA',
     aboutTitleHi: 'IPA के बारे में',
     aboutText:
-      'This is a demo of the IPA website, filled with sample listings so you can click through every page without the backend running.\n\nThe photographs are public-domain pictures, the prices are made up and the phone number is not a real line. The map, Google Earth and directions buttons do point at real places in Telangana.',
+      'This is a demo of the IPA website, filled with sample listings so you can click through every page without the backend running.\n\nThe photographs are public-domain pictures, the prices are made up and the phone number is not a real line. The map, Google Earth and directions buttons do point at real places in Telangana and Rajasthan.',
     aboutTextHi:
-      'यह IPA वेबसाइट का डेमो है, जिसमें नमूना प्रॉपर्टी भरी हैं ताकि बैकएंड चलाए बिना हर पेज देखा जा सके।\n\nफ़ोटो सार्वजनिक डोमेन की हैं, कीमतें काल्पनिक हैं और फ़ोन नंबर असली लाइन नहीं है। नक्शा, गूगल अर्थ और दिशा-निर्देश बटन तेलंगाना की असली जगहों पर ले जाते हैं।',
+      'यह IPA वेबसाइट का डेमो है, जिसमें नमूना प्रॉपर्टी भरी हैं ताकि बैकएंड चलाए बिना हर पेज देखा जा सके।\n\nफ़ोटो सार्वजनिक डोमेन की हैं, कीमतें काल्पनिक हैं और फ़ोन नंबर असली लाइन नहीं है। नक्शा, गूगल अर्थ और दिशा-निर्देश बटन तेलंगाना और राजस्थान की असली जगहों पर ले जाते हैं।',
     contactTitle: 'Looking for something specific?',
     contactTitleHi: 'कुछ ख़ास ढूँढ रहे हैं?',
     contactText: 'Tell us the area, the size and the budget, and we will send what is available this week.',
@@ -381,7 +436,7 @@ const DEMO_SITE: Site = {
   },
   hero: heroImage,
   portrait: null,
-  locations: ['Hyderabad', 'Palampet', 'Shamshabad', 'Warangal'],
+  locations: ['Deogarh', 'Hyderabad', 'Palampet', 'Shamshabad', 'Warangal'],
   counts: {
     land: DEMO_PROPERTIES.filter((p) => p.type === 'land').length,
     residential: DEMO_PROPERTIES.filter((p) => p.type === 'residential').length,
