@@ -28,6 +28,23 @@ everything from the backend's admin panel; this site has nothing to edit.
 Built with Next.js 16 (App Router, Cache Components). Pages are cached and refresh within seconds
 when the backend reports a change, or every minute otherwise.
 
+## Try it without the backend (demo mode)
+
+Set `NEXT_PUBLIC_DEMO=1` and the site runs on five sample listings built into `lib/demo.ts`,
+with no backend at all:
+
+```bash
+NEXT_PUBLIC_DEMO=1 npm run dev
+```
+
+You get land, a villa and an office floor (one under offer, one sold), photos, a short video, a
+site plan, maps at real coordinates in Telangana with the Google Maps / Earth / directions buttons
+live, WhatsApp, call and email links, QR codes, both languages and a private link at
+`/p/demo-preview`. A black "Demo" bar sits at the top of every page, and the enquiry form confirms
+without sending anything. The photographs are CC0 / public domain — see `public/demo/CREDITS.txt`.
+
+Leave the variable out (or set it to `0`) for a real site; nothing in demo mode is reachable then.
+
 ## Deploy on Vercel
 
 Set up the backend on your VPS first (see the backend's [DEPLOY.md](https://github.com/CHEDFOX/IPA-Backend/blob/HEAD/DEPLOY.md)), so the first build has

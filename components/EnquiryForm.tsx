@@ -5,6 +5,8 @@ import type { Dictionary } from '@/lib/i18n';
 
 interface Props {
   apiUrl: string;
+  /** Demo mode: confirm the message without a backend to send it to. */
+  demo?: boolean;
   propertyId?: number;
   defaultMessage?: string;
   labels: Dictionary['enquiry'];
@@ -12,13 +14,17 @@ interface Props {
 
 type State = { kind: 'idle' } | { kind: 'sending' } | { kind: 'done' } | { kind: 'error'; message: string };
 
-export function EnquiryForm({ apiUrl, propertyId, defaultMessage = '', labels }: Props) {
+export function EnquiryForm({ apiUrl, demo = false, propertyId, defaultMessage = '', labels }: Props) {
   const [state, setState] = useState<State>({ kind: 'idle' });
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     setState({ kind: 'sending' });
+    if (demo) {
+      setTimeout(() => setState({ kind: 'done' }), 500);
+      return;
+    }
     try {
       const res = await fetch(`${apiUrl}/api/enquiries`, {
         method: 'POST',

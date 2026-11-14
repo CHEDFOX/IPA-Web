@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import { DEMO, demoListings, demoProperty, demoSharedProperty, demoSite } from './demo';
 import type { Property, PropertyCard, Site } from './types';
 
 const trim = (url: string) => url.replace(/\/+$/, '');
@@ -67,6 +68,10 @@ function onBackendError(path: string, err: unknown) {
 export async function getSite(): Promise<Site> {
   'use cache';
   cacheTag(CACHE_TAG);
+  if (DEMO) {
+    cacheLife(FRESH);
+    return demoSite();
+  }
   try {
     const site = await request<Site>('/api/site');
     cacheLife(FRESH);
@@ -81,6 +86,10 @@ export async function getSite(): Promise<Site> {
 export async function getListings(): Promise<PropertyCard[]> {
   'use cache';
   cacheTag(CACHE_TAG);
+  if (DEMO) {
+    cacheLife(FRESH);
+    return demoListings();
+  }
   try {
     const data = await request<{ items: PropertyCard[] }>('/api/properties');
     cacheLife(FRESH);
@@ -94,6 +103,10 @@ export async function getListings(): Promise<PropertyCard[]> {
 export async function getProperty(slug: string): Promise<Property | null> {
   'use cache';
   cacheTag(CACHE_TAG);
+  if (DEMO) {
+    cacheLife(FRESH);
+    return demoProperty(slug);
+  }
   try {
     const property = await request<Property>(`/api/properties/${encodeURIComponent(slug)}`);
     cacheLife(FRESH);
@@ -108,6 +121,10 @@ export async function getProperty(slug: string): Promise<Property | null> {
 export async function getSharedProperty(token: string): Promise<Property | null> {
   'use cache';
   cacheTag(CACHE_TAG);
+  if (DEMO) {
+    cacheLife(FRESH);
+    return demoSharedProperty(token);
+  }
   try {
     const property = await request<Property>(`/api/share/${encodeURIComponent(token)}`);
     cacheLife(FRESH);

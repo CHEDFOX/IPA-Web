@@ -5,6 +5,7 @@ import { PropertySkeleton } from '@/components/PropertySkeleton';
 import { PropertyView } from '@/components/PropertyView';
 import { Shell } from '@/components/Shell';
 import { getListings, getProperty, getSite, PUBLIC_API_URL, SITE_URL } from '@/lib/api';
+import { DEMO } from '@/lib/demo';
 import { formatter } from '@/lib/format';
 import { DICTIONARIES, localeHref, type Dictionary, type Locale } from '@/lib/i18n';
 import { getDictionary, getLocale } from '@/lib/locale';
@@ -70,6 +71,7 @@ async function PropertyContent({ slug, settings, locale, t }: { slug: string; se
       pageUrl={`${SITE_URL}${localeHref(locale, path)}`}
       qrUrl={localeHref(locale, `${path}/qr`)}
       apiUrl={PUBLIC_API_URL}
+      demo={DEMO}
       related={relatedTo(property.slug, property.type, listings).map((p) => localizeCard(p, locale))}
     />
   );

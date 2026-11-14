@@ -502,3 +502,17 @@ html[lang='hi'] :is(.label, .card-kicker, .brand-tag, .breadcrumb, .divider, .fa
   text-transform: none;
 }
 html[lang='hi'] .hero-panel h1 { font-size: clamp(32px, 3.8vw, 54px); }
+
+/* ---------- demo banner (NEXT_PUBLIC_DEMO=1) */
+
+.demo-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding: 9px var(--gutter); background: var(--ink); color: #fff;
+  font-size: 13.5px; line-height: 1.4;
+}
+.demo-bar a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.demo-bar a:hover { color: #fff; }
+.demo-tag {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 8px; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 999px;
+}

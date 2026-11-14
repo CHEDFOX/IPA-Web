@@ -20,6 +20,8 @@ interface Props {
   pageUrl: string;
   qrUrl: string;
   apiUrl: string;
+  /** Demo mode: the enquiry form confirms without sending. */
+  demo?: boolean;
   related?: PropertyCard[];
   notice?: string;
 }
@@ -33,7 +35,7 @@ function keyFacts(p: Property, t: Dictionary, fmt: Formatter) {
   return facts.slice(0, 4);
 }
 
-export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, qrUrl, apiUrl, related = [], notice }: Props) {
+export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, qrUrl, apiUrl, demo = false, related = [], notice }: Props) {
   const href = (path: string) => localeHref(locale, path);
   const facts = keyFacts(p, t, fmt);
   const details = p.details.filter((d) => d.label && d.value);
@@ -199,6 +201,7 @@ export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, q
               <div className="divider">{wa || tel || mail ? t.property.orMessage : t.property.sendMessage}</div>
               <EnquiryForm
                 apiUrl={apiUrl}
+                demo={demo}
                 propertyId={p.id}
                 defaultMessage={fill(t.enquiry.defaultMessage, { title: p.title })}
                 labels={t.enquiry}

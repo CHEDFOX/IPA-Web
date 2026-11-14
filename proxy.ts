@@ -17,6 +17,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except API routes, build assets and the root files (icon, sitemap, robots).
-  matcher: ['/((?!api/|_next/|icon\\.svg|sitemap\\.xml|robots\\.txt|favicon\\.ico).*)'],
+  // Everything except API routes, build assets, the demo photos and the root files
+  // (icon, sitemap, robots).
+  matcher: ['/((?!api/|_next/|demo/|icon\\.svg|sitemap\\.xml|robots\\.txt|favicon\\.ico).*)'],
 };

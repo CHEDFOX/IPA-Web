@@ -5,6 +5,7 @@ import { PropertySkeleton } from '@/components/PropertySkeleton';
 import { PropertyView } from '@/components/PropertyView';
 import { Shell } from '@/components/Shell';
 import { getSharedProperty, getSite, PUBLIC_API_URL, SITE_URL } from '@/lib/api';
+import { DEMO } from '@/lib/demo';
 import { formatter } from '@/lib/format';
 import { DICTIONARIES, localeHref, type Dictionary, type Locale } from '@/lib/i18n';
 import { getDictionary, getLocale } from '@/lib/locale';
@@ -62,6 +63,7 @@ async function PrivateContent({ token, settings, locale, t }: { token: string; s
       pageUrl={`${SITE_URL}${localeHref(locale, `/p/${token}`)}`}
       qrUrl={localeHref(locale, `/p/${token}/qr`)}
       apiUrl={PUBLIC_API_URL}
+      demo={DEMO}
       notice={notices[property.visibility]}
     />
   );

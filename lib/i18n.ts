@@ -136,6 +136,11 @@ const en = {
     offline: 'Could not connect. Please try again, or use WhatsApp.',
     defaultMessage: "I'm interested in {title}. When can I visit?",
   },
+  demo: {
+    label: 'Demo',
+    text: 'Sample listings and public-domain photos — nothing here is for sale.',
+    privateLink: 'See a private link',
+  },
   notFound: {
     kicker: 'Not found',
     title: 'This page is not available',
@@ -265,6 +270,11 @@ const hi: Dictionary = {
     failed: 'आपका संदेश नहीं भेजा जा सका।',
     offline: 'कनेक्ट नहीं हो सका। फिर से कोशिश करें, या WhatsApp का इस्तेमाल करें।',
     defaultMessage: 'मुझे {title} में रुचि है। क्या इसे देखने का समय मिल सकता है?',
+  },
+  demo: {
+    label: 'डेमो',
+    text: 'नमूना प्रॉपर्टी और सार्वजनिक डोमेन की तस्वीरें — यहाँ कुछ भी बिक्री के लिए नहीं है।',
+    privateLink: 'प्राइवेट लिंक देखें',
   },
   notFound: {
     kicker: 'नहीं मिला',

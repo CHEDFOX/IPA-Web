@@ -1,0 +1,25 @@
+Demo photographs used by the sample listings (NEXT_PUBLIC_DEMO=1).
+All are CC0 / public domain, collected through openverse.org.
+
+hero/hero: Palampet village and nearby farmlands, Telangana India - 3 — Ms Sarah Welch (CC0) https://commons.wikimedia.org/w/index.php?curid=102863223
+green-acres-palampet/1: Palampet village and nearby farmlands, Telangana India - 3 — Ms Sarah Welch (CC0) https://commons.wikimedia.org/w/index.php?curid=102863223
+green-acres-palampet/2: Farming Fields — World Travel Adventures (CC0) https://stocksnap.io/photo/farming-fields-OGUY6JXNBC
+green-acres-palampet/3: Palampet village and nearby farmlands, Telangana India - 2 — Ms Sarah Welch (CC0) https://commons.wikimedia.org/w/index.php?curid=102863218
+green-acres-palampet/4: Sunrise over paddy fields with palm trees in rural Telangana, India — Mohammad Anees Qamar (CC0) https://commons.wikimedia.org/w/index.php?curid=183127963
+green-acres-palampet/5: Farming Fields — World Travel Adventures (CC0) https://stocksnap.io/photo/farming-fields-VRZVVGVJN4
+highway-plot-warangal/1: Farming Fields — World Travel Adventures (CC0) https://stocksnap.io/photo/farming-fields-VRZVVGVJN4
+highway-plot-warangal/2: Palampet village and nearby farmlands, Telangana India - 1 — Ms Sarah Welch (CC0) https://commons.wikimedia.org/w/index.php?curid=102863219
+highway-plot-warangal/3: Farming Fields — World Travel Adventures (CC0) https://stocksnap.io/photo/farming-fields-OGUY6JXNBC
+orchard-plot-shamshabad/1: Sunrise over paddy fields with palm trees in rural Telangana, India — Mohammad Anees Qamar (CC0) https://commons.wikimedia.org/w/index.php?curid=183127963
+orchard-plot-shamshabad/2: Farmland Wortley, United Kingdom — unknown (CC0) https://www.rawpixel.com/image/3284716/free-photo-image-soil-farming-land-wooden-texture
+villa-gachibowli/1: Modern house, real estate — unknown (CC0) https://www.rawpixel.com/image/6043057/photo-image-public-domain-house-home
+villa-gachibowli/2: Modern House — Matt Bango (CC0) https://stocksnap.io/photo/modern-house-UIU7D31EDY
+villa-gachibowli/3: Minimal square modern house — unknown (CC0) https://www.rawpixel.com/image/6042800/photo-image-public-domain-minimal-house
+villa-gachibowli/4: Free minimal living room plants — unknown (CC0) https://www.rawpixel.com/image/5926843/photo-image-public-domain-plants-minimal
+villa-gachibowli/5: Spacious modern kitchen design — unknown (CC0) https://www.rawpixel.com/image/6077474/dsc09439
+villa-gachibowli/6: Free luxury bath tub image — unknown (CC0) https://www.rawpixel.com/image/5922508/photo-image-public-domain-house-room
+office-floor-hitec-city/1: Office building Baltimore city — unknown (CC0) https://www.rawpixel.com/image/6040476/photo-image-public-domain-office-free
+office-floor-hitec-city/2: Free office building — unknown (CC0) https://www.rawpixel.com/image/5912064/free-office-building-public-domain-cc0-photo
+office-floor-hitec-city/3: Office Interior — Matt Moloney (CC0) https://stocksnap.io/photo/office-interior-NSQTXCLWQ5
+office-floor-hitec-city/4: Table Chairs — Benjamin Child (CC0) https://stocksnap.io/photo/table-chairs-7OPWOSQFXS
+office-floor-hitec-city/5: Interior Design — Breather (CC0) https://stocksnap.io/photo/interior-design-478BZDEA2Y
