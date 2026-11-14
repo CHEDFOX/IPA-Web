@@ -45,6 +45,10 @@ without sending anything. The photographs are CC0 / public domain — see `publi
 
 Leave the variable out (or set it to `0`) for a real site; nothing in demo mode is reachable then.
 
+To put the demo on Vercel, add `NEXT_PUBLIC_DEMO` = `1` under Settings → Environment Variables and
+redeploy. That is the one variable it needs: `NEXT_PUBLIC_API_URL` is not required in demo mode, and
+the build stops with a message if neither is set.
+
 ## Deploy on Vercel
 
 Set up the backend on your VPS first (see the backend's [DEPLOY.md](https://github.com/CHEDFOX/IPA-Backend/blob/HEAD/DEPLOY.md)), so the first build has

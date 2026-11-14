@@ -1,9 +1,10 @@
 import type { NextConfig } from 'next';
 
 // Without the backend address a Vercel deploy would succeed but show no listings, so stop early.
-if (process.env.VERCEL && !process.env.NEXT_PUBLIC_API_URL) {
+// Demo mode (NEXT_PUBLIC_DEMO=1) has no backend to point at, so it is allowed through.
+if (process.env.VERCEL && !process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_DEMO !== '1') {
   throw new Error(
-    'NEXT_PUBLIC_API_URL is not set. Add it in Vercel → Project → Settings → Environment Variables, e.g. https://api.yourdomain.com',
+    'NEXT_PUBLIC_API_URL is not set. Add it in Vercel → Project → Settings → Environment Variables, e.g. https://api.yourdomain.com — or set NEXT_PUBLIC_DEMO=1 to deploy the sample listings instead.',
   );
 }
 
