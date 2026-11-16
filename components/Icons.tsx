@@ -113,3 +113,9 @@ export const Play = ({ size = 16, ...rest }: IconProps) => (
     <path d="M8 5v14l11-7z" />
   </svg>
 );
+export const Lock = ({ open = false, ...p }: IconProps & { open?: boolean }) => (
+  <Icon {...p}>
+    <rect x="3" y="11" width="18" height="10" rx="2" />
+    {open ? <path d="M7 11V7a5 5 0 0 1 9.9-1" /> : <path d="M7 11V7a5 5 0 0 1 10 0v4" />}
+  </Icon>
+);

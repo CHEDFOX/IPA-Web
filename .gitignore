@@ -42,3 +42,6 @@ next-env.d.ts
 
 # allow the example file
 !.env.example
+
+# uploaded media and the sqlite database
+/data

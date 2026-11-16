@@ -69,6 +69,13 @@ export interface NearbyRow {
   distance: string;
 }
 
+export interface Region {
+  id: number;
+  slug: string;
+  name: string;
+  nameHi?: string;
+}
+
 export interface PropertyCard {
   id: number;
   slug: string;
@@ -82,6 +89,8 @@ export interface PropertyCard {
   priceNote: string;
   location: string;
   locationHi?: string;
+  /** The managed region this listing sits in; `location` is its name, kept for older callers. */
+  region?: Region | null;
   area: number | null;
   areaUnit: AreaUnit;
   bedrooms: number | null;
@@ -95,6 +104,13 @@ export interface PropertyCard {
 }
 
 export interface Property extends Omit<PropertyCard, 'photoCount' | 'videoCount'> {
+  /**
+   * True while the photos, videos, map and exact address are withheld behind an access code.
+   * The gated fields below are then empty, and arrive from /api/unlock once a code is entered.
+   */
+  locked?: boolean;
+  photoCount?: number;
+  videoCount?: number;
   address: string;
   addressHi?: string;
   latitude: number | null;
@@ -126,6 +142,9 @@ export interface Settings {
   instagram: string;
   facebook: string;
   footerNote: string;
+  /** Shown on the locked card so visitors know who to ask for an access code. */
+  unlockHelpText?: string;
+  unlockHelpTextHi?: string;
   siteNameHi?: string;
   taglineHi?: string;
   heroTitleHi?: string;
@@ -138,10 +157,25 @@ export interface Settings {
   footerNoteHi?: string;
 }
 
+/** The gated half of a listing, served only to a visitor holding a live unlock. */
+export interface UnlockedDetail {
+  address: string;
+  addressHi?: string;
+  latitude: number | null;
+  longitude: number | null;
+  nearby: NearbyRow[];
+  gallery: GalleryItem[];
+  plan: ImageMedia | null;
+  brochure: DocumentMedia | null;
+  /** Epoch milliseconds at which the unlock lapses unless the visitor stays on the site. */
+  expiresAt: number;
+}
+
 export interface Site {
   settings: Settings;
   hero: ImageMedia | null;
   portrait: ImageMedia | null;
   locations: string[];
+  regions: Region[];
   counts: Record<PropertyType | 'total', number>;
 }

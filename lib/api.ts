@@ -1,137 +1,72 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import { DEMO, demoListings, demoProperty, demoSharedProperty, demoSite } from './demo';
-import type { Property, PropertyCard, Site } from './types';
+import type { Property, PropertyCard, Region, Site } from './types';
 
-const trim = (url: string) => url.replace(/\/+$/, '');
-
-/** Backend address the browser uses (enquiry form). */
-export const PUBLIC_API_URL = trim(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000');
-/** Backend address the server uses. */
-const SERVER_API_URL = PUBLIC_API_URL;
-/** This website's public address. On Vercel it defaults to the project's production domain. */
-export const SITE_URL = trim(
+/** This website's public address. Used for link previews, QR codes and the sitemap. */
+export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000'),
-);
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000')
+).replace(/\/+$/, '');
 
-/** Every cached request carries this tag; the backend's refresh call clears them all. */
+/** Kept for the enquiry form, which now posts to this same app. */
+export const PUBLIC_API_URL = '';
+
+/** Every cached read carries this tag; an admin edit clears them all. */
 export const CACHE_TAG = 'ipa';
 
-const EMPTY_SITE: Site = {
-  settings: {
-    siteName: 'IPA',
-    tagline: 'Real estate & land',
-    heroTitle: 'Land and property, ready to view.',
-    heroText: '',
-    aboutTitle: '',
-    aboutText: '',
-    contactTitle: 'Looking for something specific?',
-    contactText: '',
-    phone: '',
-    whatsapp: '',
-    email: '',
-    address: '',
-    currency: 'USD',
-    instagram: '',
-    facebook: '',
-    footerNote: '',
-  },
-  hero: null,
-  portrait: null,
-  locations: [],
-  counts: { land: 0, residential: 0, commercial: 0, total: 0 },
-};
+const FRESH = 'hours';
 
-class NotFound extends Error {}
-
-async function request<T>(path: string): Promise<T> {
-  const res = await fetch(`${SERVER_API_URL}${path}`, {
-    headers: { accept: 'application/json' },
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (res.status === 404) throw new NotFound(path);
-  if (!res.ok) throw new Error(`Backend request ${path} failed with HTTP ${res.status}`);
-  return res.json() as Promise<T>;
-}
-
-// Normal entries refresh every minute in the background, and straight away when the backend
-// calls /api/revalidate. If the backend is unreachable the site stays up with empty content
-// and retries after 30 seconds. Only one cacheLife call may run per cached call.
-const FRESH = 'minutes';
-const RETRY_SOON = { stale: 30, revalidate: 30, expire: 300 };
-
-function onBackendError(path: string, err: unknown) {
-  console.error(`[ipa] ${path}:`, err instanceof Error ? err.message : err);
-  cacheLife(RETRY_SOON);
-}
+/**
+ * Data comes from the SQLite database in this same app (see lib/server). The reads live
+ * behind 'use cache' so pages stay prerendered, and every admin edit calls
+ * revalidateTag(CACHE_TAG).
+ *
+ * Gated listings are always cached in their locked form: the photos, map and address are
+ * never part of the cached HTML. A visitor who enters a code gets them from /api/unlock.
+ */
 
 export async function getSite(): Promise<Site> {
   'use cache';
   cacheTag(CACHE_TAG);
-  if (DEMO) {
-    cacheLife(FRESH);
-    return demoSite();
-  }
-  try {
-    const site = await request<Site>('/api/site');
-    cacheLife(FRESH);
-    return site;
-  } catch (err) {
-    onBackendError('/api/site', err);
-    return EMPTY_SITE;
-  }
+  cacheLife(FRESH);
+  if (DEMO) return demoSite();
+  const { readSite } = await import('./server/read');
+  return readSite();
 }
 
-/** All public listings; pages filter them, which keeps one cached request for the whole portfolio. */
 export async function getListings(): Promise<PropertyCard[]> {
   'use cache';
   cacheTag(CACHE_TAG);
-  if (DEMO) {
-    cacheLife(FRESH);
-    return demoListings();
-  }
-  try {
-    const data = await request<{ items: PropertyCard[] }>('/api/properties');
-    cacheLife(FRESH);
-    return data.items;
-  } catch (err) {
-    onBackendError('/api/properties', err);
-    return [];
-  }
+  cacheLife(FRESH);
+  if (DEMO) return demoListings();
+  const { readListings } = await import('./server/read');
+  return readListings();
 }
 
 export async function getProperty(slug: string): Promise<Property | null> {
   'use cache';
   cacheTag(CACHE_TAG);
-  if (DEMO) {
-    cacheLife(FRESH);
-    return demoProperty(slug);
-  }
-  try {
-    const property = await request<Property>(`/api/properties/${encodeURIComponent(slug)}`);
-    cacheLife(FRESH);
-    return property;
-  } catch (err) {
-    if (err instanceof NotFound) cacheLife(FRESH);
-    else onBackendError(`/api/properties/${slug}`, err);
-    return null;
-  }
+  cacheLife(FRESH);
+  if (DEMO) return demoProperty(slug);
+  const { readProperty } = await import('./server/read');
+  return readProperty(slug);
 }
 
+/** Private links are shared deliberately, so they open the listing in full, code or no code. */
 export async function getSharedProperty(token: string): Promise<Property | null> {
   'use cache';
   cacheTag(CACHE_TAG);
-  if (DEMO) {
-    cacheLife(FRESH);
-    return demoSharedProperty(token);
-  }
-  try {
-    const property = await request<Property>(`/api/share/${encodeURIComponent(token)}`);
-    cacheLife(FRESH);
-    return property;
-  } catch (err) {
-    if (err instanceof NotFound) cacheLife(FRESH);
-    else onBackendError(`/api/share/${token}`, err);
-    return null;
-  }
+  cacheLife(FRESH);
+  if (DEMO) return demoSharedProperty(token);
+  const { readSharedProperty } = await import('./server/read');
+  return readSharedProperty(token);
+}
+
+export async function getRegions(): Promise<Region[]> {
+  'use cache';
+  cacheTag(CACHE_TAG);
+  cacheLife(FRESH);
+  if (DEMO) return demoSite().regions;
+  const { readRegions } = await import('./server/read');
+  return readRegions();
 }

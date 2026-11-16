@@ -437,6 +437,11 @@ const DEMO_SITE: Site = {
   hero: heroImage,
   portrait: null,
   locations: ['Deogarh', 'Hyderabad', 'Palampet', 'Shamshabad', 'Warangal'],
+  regions: ['Deogarh', 'Hyderabad', 'Palampet', 'Shamshabad', 'Warangal'].map((name, i) => ({
+    id: i + 1,
+    slug: name.toLowerCase(),
+    name,
+  })),
   counts: {
     land: DEMO_PROPERTIES.filter((p) => p.type === 'land').length,
     residential: DEMO_PROPERTIES.filter((p) => p.type === 'residential').length,

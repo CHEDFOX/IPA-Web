@@ -3,6 +3,7 @@ import { mailtoHref, paragraphs, telHref, whatsappHref, type Formatter } from '@
 import { fill, localeHref, type Dictionary, type Locale } from '@/lib/i18n';
 import type { Property, PropertyCard, Settings } from '@/lib/types';
 import { EnquiryForm } from './EnquiryForm';
+import { GateGallery, GateLocation, GateProvider } from './GatedDetail';
 import { Gallery, ZoomImage } from './Gallery';
 import { ArrowRight, Chat, Download, Mail, Phone, Pin } from './Icons';
 import { LocationMap } from './LocationMap';
@@ -22,6 +23,8 @@ interface Props {
   apiUrl: string;
   /** Demo mode: the enquiry form confirms without sending. */
   demo?: boolean;
+  /** Set on a private-link page: unlocking there goes by token, not slug. */
+  shareToken?: string;
   related?: PropertyCard[];
   notice?: string;
 }
@@ -35,7 +38,20 @@ function keyFacts(p: Property, t: Dictionary, fmt: Formatter) {
   return facts.slice(0, 4);
 }
 
-export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, qrUrl, apiUrl, demo = false, related = [], notice }: Props) {
+export function PropertyView({
+  property: p,
+  settings,
+  locale,
+  t,
+  fmt,
+  pageUrl,
+  qrUrl,
+  apiUrl,
+  demo = false,
+  shareToken,
+  related = [],
+  notice,
+}: Props) {
   const href = (path: string) => localeHref(locale, path);
   const facts = keyFacts(p, t, fmt);
   const details = p.details.filter((d) => d.label && d.value);
@@ -49,7 +65,7 @@ export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, q
   const perUnit = fmt.perUnit(p);
   const priceLabel = p.status === 'sold' ? t.property.sold : p.price === null ? t.property.price : t.property.askingPrice;
 
-  return (
+  const body = (
     <div className="has-mobile-bar">
       <div className="wrap">
         {notice && (
@@ -92,7 +108,7 @@ export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, q
           </div>
         </div>
 
-        <Gallery items={p.gallery} title={p.title} labels={t.property} />
+        {p.locked ? <GateGallery /> : <Gallery items={p.gallery} title={p.title} labels={t.property} />}
 
         <div className="prop-body">
           <div className="prop-main">
@@ -133,7 +149,9 @@ export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, q
               </section>
             )}
 
-            {(hasMap || p.plan || nearby.length > 0) && (
+            {p.locked && <GateLocation />}
+
+            {!p.locked && (hasMap || p.plan || nearby.length > 0) && (
               <section className="block" aria-labelledby="location-title">
                 <h2 id="location-title">{t.property.location}</h2>
                 {hasMap && (
@@ -247,5 +265,24 @@ export function PropertyView({ property: p, settings, locale, t, fmt, pageUrl, q
         </div>
       )}
     </div>
+  );
+
+  if (!p.locked) return body;
+
+  return (
+    <GateProvider
+      slug={shareToken ? undefined : p.slug}
+      token={shareToken}
+      title={p.title}
+      type={p.type}
+      locale={locale}
+      t={t}
+      photoCount={p.photoCount ?? 0}
+      videoCount={p.videoCount ?? 0}
+      whatsapp={wa}
+      helpText={settings.unlockHelpText || undefined}
+    >
+      {body}
+    </GateProvider>
   );
 }
