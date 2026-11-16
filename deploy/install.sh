@@ -72,7 +72,7 @@ fi
 # Who serves HTTPS: us, or a web server this machine already runs.
 if port_busy 80 || port_busy 443; then
   OWN_PROXY=0
-  EXISTING="$(ss -ltnp 2>/dev/null | awk '/:80 |:443 /{print $NF}' | grep -oE '"[a-z0-9_-]+"' | tr -d '"' | sort -u | head -3 | tr '\n' ' ')"
+  EXISTING="$(ss -ltnp 2>/dev/null | awk '/:80 |:443 /{print $NF}' | grep -oE '"[a-z0-9_-]+"' | tr -d '"' | sort -u | tr '\n' ' ' || true)"
 else
   OWN_PROXY=1
   EXISTING=""
@@ -80,7 +80,8 @@ fi
 
 if [ ! -f .env ]; then
   echo "==> Writing .env with a freshly generated admin password"
-  PASSWORD="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)"
+  # Not `tr ... | head -c`: head closes the pipe, tr dies of SIGPIPE and pipefail kills us.
+  PASSWORD="$(od -An -tx1 -N16 /dev/urandom | tr -d ' \n')"
   cat > .env <<ENV
 DOMAIN=$DOMAIN
 SITE_URL=https://www.$DOMAIN
@@ -106,14 +107,16 @@ fi
 
 echo
 echo "==> Checking the site answers on 127.0.0.1:$PORT"
-for i in $(seq 1 30); do
-  if curl -fsS -o /dev/null "http://127.0.0.1:$PORT/robots.txt"; then
-    echo "    it does."
-    break
-  fi
-  [ "$i" = 30 ] && echo "    no answer yet — see: docker compose logs --tail 50 web"
+UP=0
+for _ in $(seq 1 30); do
+  if curl -fs -o /dev/null "http://127.0.0.1:$PORT/robots.txt" 2>/dev/null; then UP=1; break; fi
   sleep 2
 done
+if [ "$UP" = "1" ]; then
+  echo "    it does."
+else
+  echo "    no answer yet. Check with:  cd $DIR && docker compose logs --tail 50 web"
+fi
 
 if [ "$NEW_PASSWORD" = "1" ]; then
   echo
