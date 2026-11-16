@@ -91,6 +91,10 @@ Everything that matters — the database and every uploaded photo — is in the 
 Copy it somewhere safe on a schedule; `npm run backup` makes a consistent copy of the database
 while the site keeps serving.
 
+After restoring a backup into the volume, open the admin panel and press **Refresh the public
+pages** on the Overview. Saving anything in the panel does the same thing; it is only needed when
+the data changed underneath the app.
+
 **Without Docker**: `deploy/ipa-web.service` (systemd) and `deploy/nginx.conf` (nginx + certbot).
 Node 22 and `ffmpeg` need to be installed; `npm ci && npm run build && npm run start`.
 

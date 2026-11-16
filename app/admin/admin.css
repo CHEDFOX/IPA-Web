@@ -168,3 +168,4 @@
 /* buttons inside a stacked fieldset should hug their text, not stretch */
 .admin-fieldset > button, .admin-fieldset > .admin-btn { align-self: flex-start; }
 .admin-code-row > div { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.admin-refresh { margin: 4px 0 18px; }

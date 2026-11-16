@@ -3,6 +3,7 @@ import { activeCode, countNewAccessRequests, listAccessRequests } from '@/lib/se
 import { getDb } from '@/lib/server/db';
 import { listAllProperties, listRegions } from '@/lib/server/repo';
 import { readSettings } from '@/lib/server/settings';
+import { refreshSite } from './actions';
 import { connection } from 'next/server';
 import { isSignedIn } from '@/lib/server/auth';
 
@@ -31,6 +32,15 @@ export default async function AdminHome() {
         <Tile label="Code requests" value={waiting} hint="waiting for a call back" href="/admin/requests" highlight={waiting > 0} />
         <Tile label="Unread enquiries" value={unread} href="/admin/enquiries" highlight={unread > 0} />
       </div>
+
+      <form action={refreshSite} className="admin-inline-form admin-refresh">
+        <button className="admin-btn small" type="submit">
+          Refresh the public pages
+        </button>
+        <span className="admin-muted">
+          Saves in this panel do this already; use it after restoring a backup into the data folder.
+        </span>
+      </form>
 
       {!settings.whatsapp && (
         <p className="admin-note">

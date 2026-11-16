@@ -281,6 +281,12 @@ export async function removeEnquiry(form: FormData) {
   if (id) getDb().prepare('DELETE FROM enquiries WHERE id = ?').run(id);
 }
 
+/** Rebuilds the public pages now — useful after restoring a backup into the data folder. */
+export async function refreshSite() {
+  await requireAdmin();
+  published();
+}
+
 // ---------- settings
 
 export async function saveSettings(_state: ActionState, form: FormData): Promise<ActionState> {
