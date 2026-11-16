@@ -27,11 +27,8 @@ Create it with your SSH key, and note its **IP address**. Nothing else to config
 SSH in as root and run one line:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/CHEDFOX/IPA-Web/claude/optimistic-hawking-2falf0/deploy/install.sh | IPA_BRANCH=claude/optimistic-hawking-2falf0 bash -s -- indraprasthassociate.com
+curl -fsSL https://raw.githubusercontent.com/CHEDFOX/IPA-Web/main/deploy/install.sh | bash -s -- indraprasthassociate.com
 ```
-
-(That is the branch this work lives on. Once it is merged into `main`, the shorter form works:
-`curl -fsSL https://raw.githubusercontent.com/CHEDFOX/IPA-Web/main/deploy/install.sh | bash -s -- indraprasthassociate.com`)
 
 It installs Docker, fetches the site, generates an admin password, and starts everything.
 **Write down the password it prints at the end** — it is in `/opt/ipa-web/.env` too.
