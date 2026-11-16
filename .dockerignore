@@ -1,0 +1,18 @@
+# Keep the build context clean. data/ matters most: it holds the live database and every
+# uploaded photo, and copying it in would bake one machine's listings into the image.
+data
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+node_modules
+.next
+out
+build
+
+npm-debug.log*
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts

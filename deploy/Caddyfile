@@ -3,7 +3,12 @@
 #
 # DOMAIN comes from .env, e.g. DOMAIN=yourdomain.com
 
-{$DOMAIN}, www.{$DOMAIN} {
+# One canonical address: everything lands on www, as it does today.
+{$DOMAIN} {
+	redir https://www.{$DOMAIN}{uri} permanent
+}
+
+www.{$DOMAIN} {
 	encode zstd gzip
 
 	# Uploaded photos and video. Locked files are already marked private by the app,

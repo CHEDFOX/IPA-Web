@@ -16,8 +16,10 @@ services:
       PORT: 3000
     volumes:
       - ipa-data:/app/data
-    expose:
-      - '3000'
+    # Only reachable from the server itself, so the site can be checked before the domain
+    # is pointed here. Caddy reaches it over the compose network.
+    ports:
+      - '127.0.0.1:3000:3000'
 
   caddy:
     image: caddy:2-alpine
