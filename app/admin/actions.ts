@@ -12,6 +12,7 @@ import {
   createProperty,
   createRegion,
   deleteMedia,
+  getProperty,
   deleteProperty,
   deleteRegion,
   getMedia,
@@ -154,7 +155,10 @@ export async function saveProperty(_state: ActionState, form: FormData): Promise
   }
 
   if (id) {
-    updateProperty(id, fields);
+    // Only rename when the box was actually changed; re-saving the same slug would add -2.
+    const slug = text(form.get('slug'), 80);
+    const current = getProperty(id);
+    updateProperty(id, slug && current && slug !== current.slug ? { ...fields, slug } : fields);
     published();
     return { ok: 'Saved.' };
   }
@@ -319,6 +323,16 @@ export async function saveSettings(_state: ActionState, form: FormData): Promise
   writeSettings(values);
   published();
   return { ok: 'Settings saved.' };
+}
+
+export async function removeSiteImage(form: FormData) {
+  await requireAdmin();
+  const id = toInt(form.get('id'));
+  const row = id ? getMedia(id) : null;
+  if (!row) return;
+  deleteMedia(row.id);
+  await removeMediaFiles(row.key);
+  published();
 }
 
 export async function uploadSiteImage(_state: ActionState, form: FormData): Promise<ActionState> {

@@ -1,6 +1,6 @@
 import 'server-only';
 import type { Property, PropertyCard, Region, Settings, Site } from '../types';
-import { listPublicProperties, listPublicRegions, coversFor, countsByType, getPropertyBySlug, getPropertyByToken, mediaOf, siteMedia, type RegionRow } from './repo';
+import { listPublicProperties, listPublicRegions, coversFor, countsByType, currentSlugFor, getPropertyBySlug, getPropertyByToken, mediaOf, siteMedia, type RegionRow } from './repo';
 import { serializeCard, serializeImage, serializeProperty } from './serialize';
 import { readSettings } from './settings';
 
@@ -40,6 +40,11 @@ export function readProperty(slug: string): Property | null {
   const row = getPropertyBySlug(slug);
   if (!row || row.visibility !== 'public') return null;
   return serializeProperty(row, mediaOf(row.id), false);
+}
+
+/** Where an address that no longer exists should send the visitor. */
+export function readSlugRedirect(slug: string): string | null {
+  return currentSlugFor(slug);
 }
 
 /** A private link carries its own secret, so it shows the listing in full. */

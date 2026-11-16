@@ -38,6 +38,22 @@ export const SETTING_DEFAULTS = {
   /** Shown on the locked card so visitors know who to ask for a code. */
   unlockHelpText: '',
   unlockHelpTextHi: '',
+  /**
+   * Wording on the home page's "browse by type" tiles and the portfolio page. Empty means
+   * the site's built-in wording, in whichever language the visitor is reading.
+   */
+  browseTitle: '',
+  browseTitleHi: '',
+  blurbLand: '',
+  blurbLandHi: '',
+  blurbResidential: '',
+  blurbResidentialHi: '',
+  blurbCommercial: '',
+  blurbCommercialHi: '',
+  portfolioTitle: '',
+  portfolioTitleHi: '',
+  portfolioIntro: '',
+  portfolioIntroHi: '',
 } as const;
 
 export type SettingKey = keyof typeof SETTING_DEFAULTS;
@@ -46,6 +62,8 @@ export type Settings = Record<SettingKey, string>;
 export const SETTING_KEYS = Object.keys(SETTING_DEFAULTS) as SettingKey[];
 
 const LONG_FIELDS = new Set<SettingKey>([
+  'portfolioIntro',
+  'portfolioIntroHi',
   'heroText',
   'heroTextHi',
   'aboutText',

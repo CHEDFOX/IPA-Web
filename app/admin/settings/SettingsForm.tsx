@@ -18,6 +18,16 @@ const TEXT_PAIRS: { key: string; label: string; hint?: string; long?: boolean }[
   { key: 'footerNote', label: 'Footer note' },
 ];
 
+// Wording with a sensible built-in default: an empty box keeps the built-in text.
+const OPTIONAL_PAIRS: { key: string; label: string; hint?: string; long?: boolean }[] = [
+  { key: 'browseTitle', label: '"Browse by type" heading', hint: 'Default: What are you looking for?' },
+  { key: 'blurbLand', label: 'Land tile description', hint: 'Default: Plots, farmland, development land' },
+  { key: 'blurbResidential', label: 'Residential tile description', hint: 'Default: Villas, houses, apartments' },
+  { key: 'blurbCommercial', label: 'Commercial tile description', hint: 'Default: Offices, retail, sites' },
+  { key: 'portfolioTitle', label: 'Portfolio page heading', hint: 'Default: All properties' },
+  { key: 'portfolioIntro', label: 'Portfolio page intro', long: true },
+];
+
 export function SettingsForm({ values }: { values: Values }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(saveSettings, undefined);
 
@@ -86,6 +96,32 @@ export function SettingsForm({ values }: { values: Values }) {
               <span>{field.label} — Hindi</span>
               {field.long ? (
                 <textarea name={`${field.key}Hi`} rows={3} defaultValue={values[`${field.key}Hi`]} />
+              ) : (
+                <input name={`${field.key}Hi`} defaultValue={values[`${field.key}Hi`]} />
+              )}
+            </label>
+          </div>
+        ))}
+      </fieldset>
+
+      <fieldset className="admin-fieldset">
+        <legend>Home tiles and portfolio page</legend>
+        <p className="admin-muted">Leave a box empty to keep the site&rsquo;s own wording in both languages.</p>
+        {OPTIONAL_PAIRS.map((field) => (
+          <div className="admin-pair" key={field.key}>
+            <label>
+              <span>{field.label}</span>
+              {field.long ? (
+                <textarea name={field.key} rows={2} defaultValue={values[field.key]} />
+              ) : (
+                <input name={field.key} defaultValue={values[field.key]} />
+              )}
+              {field.hint && <small className="admin-muted">{field.hint}</small>}
+            </label>
+            <label>
+              <span>{field.label} — Hindi</span>
+              {field.long ? (
+                <textarea name={`${field.key}Hi`} rows={2} defaultValue={values[`${field.key}Hi`]} />
               ) : (
                 <input name={`${field.key}Hi`} defaultValue={values[`${field.key}Hi`]} />
               )}

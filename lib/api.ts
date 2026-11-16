@@ -67,6 +67,16 @@ export async function getSharedProperty(token: string): Promise<Property | null>
   return readSharedProperty(token);
 }
 
+/** The address a renamed listing now lives at, so old links and QR codes still work. */
+export async function getSlugRedirect(slug: string): Promise<string | null> {
+  'use cache';
+  cacheTag(CACHE_TAG);
+  cacheLife(FRESH);
+  if (DEMO) return null;
+  const { readSlugRedirect } = await import('./server/read');
+  return readSlugRedirect(slug);
+}
+
 export async function getRegions(): Promise<Region[]> {
   'use cache';
   cacheTag(CACHE_TAG);

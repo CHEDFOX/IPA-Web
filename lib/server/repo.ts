@@ -95,6 +95,14 @@ export function getProperty(id: number): PropertyRow | null {
   return (getDb().prepare(`SELECT ${PROPERTY_COLUMNS} ${FROM} WHERE p.id = ?`).get(id) as PropertyRow) ?? null;
 }
 
+/** A listing's current address, when the one asked for is an old one. */
+export function currentSlugFor(oldSlug: string): string | null {
+  const row = getDb()
+    .prepare('SELECT p.slug FROM slug_history h JOIN properties p ON p.id = h.property_id WHERE h.slug = ?')
+    .get(oldSlug) as { slug: string } | undefined;
+  return row?.slug ?? null;
+}
+
 export function getPropertyByToken(token: string): PropertyRow | null {
   return (getDb().prepare(`SELECT ${PROPERTY_COLUMNS} ${FROM} WHERE p.share_token = ?`).get(token) as PropertyRow) ?? null;
 }
@@ -206,8 +214,15 @@ export function updateProperty(id: number, input: PropertyInput & { slug?: strin
   }
   if (input.slug) {
     const exists = db.prepare('SELECT 1 FROM properties WHERE slug = ? AND id <> ?');
+    const wanted = uniqueSlug(slugify(input.slug, 'property'), (s) => Boolean(exists.get(s, id)));
+    const current = db.prepare('SELECT slug FROM properties WHERE id = ?').get(id) as { slug: string } | undefined;
+    if (current && current.slug !== wanted) {
+      // Keep the old address pointing here: it may be on a signboard already.
+      db.prepare('INSERT OR REPLACE INTO slug_history (slug, property_id) VALUES (?, ?)').run(current.slug, id);
+      db.prepare('DELETE FROM slug_history WHERE slug = ?').run(wanted);
+    }
     sets.push('slug = @newSlug');
-    params.newSlug = uniqueSlug(slugify(input.slug, 'property'), (s) => Boolean(exists.get(s, id)));
+    params.newSlug = wanted;
   }
   if (!sets.length) return;
   sets.push("updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))");

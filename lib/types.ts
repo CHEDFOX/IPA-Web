@@ -145,6 +145,19 @@ export interface Settings {
   /** Shown on the locked card so visitors know who to ask for an access code. */
   unlockHelpText?: string;
   unlockHelpTextHi?: string;
+  /** Optional wording for the home page tiles and the portfolio page; empty = built-in. */
+  browseTitle?: string;
+  browseTitleHi?: string;
+  blurbLand?: string;
+  blurbLandHi?: string;
+  blurbResidential?: string;
+  blurbResidentialHi?: string;
+  blurbCommercial?: string;
+  blurbCommercialHi?: string;
+  portfolioTitle?: string;
+  portfolioTitleHi?: string;
+  portfolioIntro?: string;
+  portfolioIntroHi?: string;
   siteNameHi?: string;
   taglineHi?: string;
   heroTitleHi?: string;

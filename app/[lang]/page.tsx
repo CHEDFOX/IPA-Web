@@ -33,6 +33,12 @@ export default async function HomePage() {
   const heroImage = site.hero ?? heroProperty?.cover ?? null;
   const wa = whatsappHref(settings, fill(t.greeting, { name: settings.siteName }));
 
+  // Blurbs come from the admin panel when they are filled in, otherwise the built-in wording.
+  const blurbs: Record<(typeof TYPES)[number], string> = {
+    land: settings.blurbLand || t.typeBlurbs.land,
+    residential: settings.blurbResidential || t.typeBlurbs.residential,
+    commercial: settings.blurbCommercial || t.typeBlurbs.commercial,
+  };
   const types = TYPES.map((type) => ({ type, cover: listings.find((p) => p.type === type && p.cover)?.cover })).filter(
     (x) => site.counts[x.type] > 0,
   );
@@ -107,7 +113,7 @@ export default async function HomePage() {
                 {number()} — {t.home.browse}
               </span>
               <h2 id="browse-title" className="section-title">
-                {t.home.browseTitle}
+                {settings.browseTitle || t.home.browseTitle}
               </h2>
             </div>
           </div>
@@ -119,7 +125,7 @@ export default async function HomePage() {
                   <span>
                     <strong>{t.types[type]}</strong>
                     <small>
-                      {t.typeBlurbs[type]} · {site.counts[type]}
+                      {blurbs[type]} · {site.counts[type]}
                     </small>
                   </span>
                   <ArrowRight size={20} />

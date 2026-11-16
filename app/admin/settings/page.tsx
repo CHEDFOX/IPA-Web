@@ -1,6 +1,7 @@
 import { CODE_POOL, UNLOCK_MINUTES } from '@/lib/server/access';
 import { siteMedia } from '@/lib/server/repo';
 import { readSettings } from '@/lib/server/settings';
+import { removeSiteImage } from '../actions';
 import { SettingsForm, SiteImageForm } from './SettingsForm';
 import { connection } from 'next/server';
 import { isSignedIn } from '@/lib/server/auth';
@@ -26,15 +27,31 @@ export default async function SettingsPage() {
           <div>
             <SiteImageForm role="hero" label="Big picture at the top" />
             {hero && (
-               
-              <img className="admin-preview" src={`/media/${hero.key}/sm`} alt="" />
+              <>
+                { }
+                <img className="admin-preview" src={`/media/${hero.key}/sm`} alt="" />
+                <form action={removeSiteImage}>
+                  <input type="hidden" name="id" value={hero.id} />
+                  <button className="admin-btn danger small" type="submit">
+                    Remove picture
+                  </button>
+                </form>
+              </>
             )}
           </div>
           <div>
             <SiteImageForm role="portrait" label="Portrait beside the About text" />
             {portrait && (
-               
-              <img className="admin-preview" src={`/media/${portrait.key}/sm`} alt="" />
+              <>
+                { }
+                <img className="admin-preview" src={`/media/${portrait.key}/sm`} alt="" />
+                <form action={removeSiteImage}>
+                  <input type="hidden" name="id" value={portrait.id} />
+                  <button className="admin-btn danger small" type="submit">
+                    Remove picture
+                  </button>
+                </form>
+              </>
             )}
           </div>
         </div>

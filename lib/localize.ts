@@ -14,6 +14,13 @@ const SETTING_KEYS = [
   'contactText',
   'address',
   'footerNote',
+  'unlockHelpText',
+  'browseTitle',
+  'blurbLand',
+  'blurbResidential',
+  'blurbCommercial',
+  'portfolioTitle',
+  'portfolioIntro',
 ] as const;
 
 /**
@@ -25,7 +32,8 @@ export function localizeSettings(settings: Settings, locale: Locale): Settings {
   const out = { ...settings };
   for (const key of SETTING_KEYS) {
     const hindi = settings[`${key}Hi`];
-    out[key] = hindi?.trim() ? hindi : (STANDARD_TEXT_HI[settings[key]] ?? settings[key]);
+    const english = settings[key] ?? '';
+    out[key] = hindi?.trim() ? hindi : (STANDARD_TEXT_HI[english] ?? english);
   }
   return out;
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { PropertySkeleton } from '@/components/PropertySkeleton';
 import { PropertyView } from '@/components/PropertyView';
 import { Shell } from '@/components/Shell';
-import { getListings, getProperty, getSite, PUBLIC_API_URL, SITE_URL } from '@/lib/api';
+import { getListings, getProperty, getSite, getSlugRedirect, PUBLIC_API_URL, SITE_URL } from '@/lib/api';
 import { DEMO } from '@/lib/demo';
 import { formatter } from '@/lib/format';
 import { DICTIONARIES, localeHref, type Dictionary, type Locale } from '@/lib/i18n';
@@ -48,6 +48,10 @@ export default async function PropertyPage({ params }: PageProps<'/[lang]/proper
   const site = await getSite();
   const settings = localizeSettings(site.settings, locale);
   const { slug } = await params;
+  // A renamed listing keeps its old address working, so printed QR codes and shared links
+  // still land on it. Checked before the page streams, so it is a real 308.
+  const moved = await getSlugRedirect(slug);
+  if (moved) permanentRedirect(localeHref(locale, `/properties/${moved}`));
   return (
     <Shell settings={settings} locale={locale} t={t} path={`/properties/${slug}`}>
       <Suspense fallback={<PropertySkeleton label={t.property.loading} />}>

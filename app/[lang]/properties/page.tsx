@@ -17,7 +17,12 @@ import type { Settings, Site } from '@/lib/types';
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = DICTIONARIES[locale];
-  return { title: t.portfolio.title, description: t.portfolio.metaDescription, alternates: alternates('/properties', locale) };
+  const settings = localizeSettings((await getSite()).settings, locale);
+  return {
+    title: settings.portfolioTitle || t.portfolio.title,
+    description: settings.portfolioIntro || t.portfolio.metaDescription,
+    alternates: alternates('/properties', locale),
+  };
 }
 
 export default async function PortfolioPage({ searchParams }: PageProps<'/[lang]/properties'>) {
@@ -28,8 +33,8 @@ export default async function PortfolioPage({ searchParams }: PageProps<'/[lang]
     <Shell settings={settings} locale={locale} t={t} path="/properties" current="portfolio">
       <section className="wrap page-intro">
         <span className="label">{t.portfolio.kicker}</span>
-        <h1>{t.portfolio.title}</h1>
-        <p>{t.portfolio.intro}</p>
+        <h1>{settings.portfolioTitle || t.portfolio.title}</h1>
+        <p>{settings.portfolioIntro || t.portfolio.intro}</p>
       </section>
       <div className="wrap">
         {/* Filters come from the URL, which is only known per request. */}

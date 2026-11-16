@@ -53,7 +53,10 @@ everything to everyone.
 | Regions | The list of places listings are filed under, and the only part of a location shown before unlocking |
 | Code requests | People who asked for a code, with a WhatsApp link to send them one |
 | Enquiries | Messages from the enquiry form |
-| Settings | The WhatsApp number every property uses, phone, email, currency, and all the site text |
+| Settings | The WhatsApp number every property uses, phone, email, currency, the home page pictures, and all the site text in both languages |
+
+Renaming a property changes its web address, and the old one keeps working: it sends visitors
+to the new address, so QR codes already printed on a signboard stay good.
 
 Setting a property's location: paste a Google Maps share link (short `maps.app.goo.gl` links are
 followed for you), plain coordinates (`25.5429, 73.9177`) or survey degrees (`28°36'46"N 77°13'46"E`).

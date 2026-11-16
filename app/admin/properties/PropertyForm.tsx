@@ -5,6 +5,7 @@ import { saveProperty, type ActionState } from '../actions';
 
 export interface PropertyFormValues {
   id?: number;
+  slug?: string;
   title: string;
   title_hi: string;
   region_id: number | null;
@@ -87,6 +88,17 @@ export function PropertyForm({
           <input name="titleHi" defaultValue={property?.title_hi ?? ''} maxLength={160} />
         </label>
 
+        {property?.id && (
+          <label className="wide">
+            <span>Web address</span>
+            <input name="slug" defaultValue={property.slug ?? ''} maxLength={80} />
+            <small className="admin-muted">
+              yourdomain.com/properties/<strong>{property.slug}</strong> — if you change it, the old address keeps
+              working and sends visitors here, so printed QR codes stay good.
+            </small>
+          </label>
+        )}
+
         <label>
           <span>Region</span>
           <select name="regionId" defaultValue={property?.region_id ?? ''}>
@@ -130,6 +142,10 @@ export function PropertyForm({
         <label>
           <span>Price note</span>
           <input name="priceNote" defaultValue={property?.price_note ?? ''} placeholder="Negotiable" maxLength={160} />
+        </label>
+        <label>
+          <span>Price note in Hindi</span>
+          <input name="priceNoteHi" defaultValue={property?.price_note_hi ?? ''} maxLength={160} />
         </label>
         <label>
           <span>Area</span>

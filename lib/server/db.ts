@@ -147,6 +147,14 @@ const MIGRATIONS: string[] = [
     created_at TEXT NOT NULL DEFAULT ${NOW}
   );
   `,
+  // 2: addresses a listing used to have, so printed QR codes and shared links keep working.
+  `
+  CREATE TABLE slug_history (
+    slug TEXT PRIMARY KEY,
+    property_id INTEGER NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT ${NOW}
+  );
+  `,
 ];
 
 let instance: Db | null = null;

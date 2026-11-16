@@ -40,6 +40,9 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
           <a href={`/p/${property.share_token}`} target="_blank" rel="noopener">
             Private link ↗
           </a>
+          <a href={`/properties/${property.slug}/qr`} target="_blank" rel="noopener">
+            QR code ↗
+          </a>
           <Link className="admin-link" href="/admin/properties">
             ← All properties
           </Link>
