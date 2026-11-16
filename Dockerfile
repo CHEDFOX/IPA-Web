@@ -8,8 +8,14 @@ RUN apt-get update \
 WORKDIR /app
 
 FROM base AS deps
+# better-sqlite3 falls back to compiling itself whenever a prebuilt binary for this exact
+# Node version is not available, and that needs Python and a compiler. They live in this
+# stage only, so the image that ships does not carry them.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
