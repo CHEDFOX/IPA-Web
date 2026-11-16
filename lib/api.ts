@@ -2,8 +2,13 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { DEMO, demoListings, demoProperty, demoSharedProperty, demoSite } from './demo';
 import type { Property, PropertyCard, Region, Site } from './types';
 
-/** This website's public address. Used for link previews, QR codes and the sitemap. */
+/**
+ * This website's public address, used for link previews, QR codes and the sitemap.
+ * SITE_URL is read at run time, so a container can be pointed at a new domain with a
+ * restart rather than a rebuild; NEXT_PUBLIC_SITE_URL still works and is baked in at build.
+ */
 export const SITE_URL = (
+  process.env.SITE_URL ||
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000')
 ).replace(/\/+$/, '');

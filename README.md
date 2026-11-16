@@ -1,94 +1,128 @@
 # IPA Web
 
-The public website for the IPA real estate & land portfolio: a photo-first showcase that is quick
-to share with clients. It is hosted on **Vercel**. Listings, photos, videos and contact details all
-come from [IPA-Backend](https://github.com/CHEDFOX/IPA-Backend), which runs on your VPS. You manage
-everything from the backend's admin panel; this site has nothing to edit.
+The IPA real estate & land site: a photo-first portfolio where the photos and the exact
+location open only with an access code your team hands out. The public site, the admin panel,
+the database and the uploaded media are all one Node app, so it runs on one server behind one
+domain.
 
 ## What's on the site
 
 - **Home**: large photo, your headline, featured listings, browse by type, About, contact band.
-- **Portfolio** (`/properties`): every public listing, filterable by type, status and location.
-- **Property pages** (`/properties/<name>`): photo and video gallery with a full-screen viewer,
-  key facts, land details, description, map, site plan, nearby places, price, and WhatsApp / call /
-  email buttons plus an enquiry form. On phones a WhatsApp + Call bar stays at the bottom.
-- **Private links** (`/p/<code>`): listings marked "Private link" or "Draft" in the admin are only
-  reachable through their private link, and are hidden from search engines.
+- **Portfolio** (`/properties`): every published listing, filterable by type, status and region.
+- **Property pages** (`/properties/<name>`): cover photo, price, area, the facts table and the
+  description are open to everyone. The gallery, video, map, address and nearby places are
+  locked until a visitor enters that property's access code.
+- **Private links** (`/p/<code>`): listings marked "Private link only" or "Draft" are reachable
+  only through their own link, which opens them in full — no code needed.
 - **Link previews**: each property has its own title, description and 1200×630 photo, so links
-  look right when pasted into WhatsApp, iMessage, Facebook, LinkedIn and so on.
+  look right in WhatsApp, iMessage and elsewhere. Only the cover is ever used.
 - **QR codes** for every property (`/properties/<name>/qr`), for signboards and flyers.
-- **Locations**: Google Maps with map and satellite views, plus buttons for Google Maps, Google
-  Earth and directions to the exact coordinates, which visitors can also copy.
-- **English and Hindi**: English at the usual addresses, Hindi under `/hi` (e.g.
-  `/hi/properties/<name>`), with a हिन्दी / English switch in the header. Buttons and labels are
-  translated in `lib/i18n.ts`; listing text uses the Hindi boxes in the admin panel and falls back
-  to English when they are empty. Prices in rupees show as lakh / crore.
-- `sitemap.xml` (both languages) and `robots.txt` for search engines.
+- **English and Hindi**: English at the usual addresses, Hindi under `/hi`, with a switch in the
+  header. Listing text uses the Hindi boxes in the admin and falls back to English when empty.
+  Prices in rupees show as lakh and crore.
+- `sitemap.xml` and `robots.txt`; the admin panel is never indexed.
 
-Built with Next.js 16 (App Router, Cache Components). Pages are cached and refresh within seconds
-when the backend reports a change, or every minute otherwise.
+## How the access codes work
 
-## Try it without the backend (demo mode)
+- Every gated property has **one code waiting** in the admin panel. Give it to a visitor.
+- A code dies when its uses run out (**one use by default**, and you can set more per code).
+  The moment it does, a fresh code appears in the panel, so you never hand out the same one twice.
+- Entering a code opens that property for **ten minutes**. The clock restarts while the visitor
+  is on the site, so reading for an hour is fine. Closing the tab and coming back within ten
+  minutes still works; leaving for longer does not.
+- A visitor without a code can leave their phone number instead. It lands under **Code requests**
+  with a WhatsApp link that pre-fills the message and the code to send.
+- The gate is enforced on the server, not in the page: a locked property's HTML carries no
+  coordinates, no address and no photo URLs beyond the cover, and every media file is served
+  through a route that checks the unlock before it sends a byte.
 
-Set `NEXT_PUBLIC_DEMO=1` and the site runs on five sample listings built into `lib/demo.ts`,
-with no backend at all:
+Turn the gate off for a single listing with the switch on its admin page, and the property shows
+everything to everyone.
+
+## The admin panel
+
+`https://yourdomain.com/admin`, with the password from `ADMIN_PASSWORD`.
+
+| Page | What you do there |
+| --- | --- |
+| Overview | What is live, who is waiting for a code, and every property's current code |
+| Properties | Add and edit listings; photos, video, site plan, brochure; access codes |
+| Regions | The list of places listings are filed under, and the only part of a location shown before unlocking |
+| Code requests | People who asked for a code, with a WhatsApp link to send them one |
+| Enquiries | Messages from the enquiry form |
+| Settings | The WhatsApp number every property uses, phone, email, currency, and all the site text |
+
+Setting a property's location: paste a Google Maps share link (short `maps.app.goo.gl` links are
+followed for you), plain coordinates (`25.5429, 73.9177`) or survey degrees (`28°36'46"N 77°13'46"E`).
+
+Photos are resized to WebP in three sizes plus a 1200×630 preview, and their EXIF — including the
+GPS tag a phone writes into every photo — is dropped on the way in.
+
+## Put it on your server
+
+You need a server with Docker, and your domain's A record pointing at it.
 
 ```bash
-NEXT_PUBLIC_DEMO=1 npm run dev
+git clone https://github.com/CHEDFOX/IPA-Web.git /opt/ipa-web
+cd /opt/ipa-web
+cp .env.example .env
+nano .env          # DOMAIN, SITE_URL, ADMIN_PASSWORD
+docker compose up -d --build
 ```
 
-You get land, a villa and an office floor (one under offer, one sold), photos, a short video, a
-site plan, maps at real coordinates in Telangana with the Google Maps / Earth / directions buttons
-live, WhatsApp, call and email links, QR codes, both languages and a private link at
-`/p/demo-preview`. A black "Demo" bar sits at the top of every page, and the enquiry form confirms
-without sending anything. The photographs are CC0 / public domain — see `public/demo/CREDITS.txt`.
+Caddy gets the HTTPS certificate by itself once the DNS record resolves. Then open
+`https://yourdomain.com/admin` and start adding regions and properties.
 
-Leave the variable out (or set it to `0`) for a real site; nothing in demo mode is reachable then.
+Day to day:
 
-To put the demo on Vercel, add `NEXT_PUBLIC_DEMO` = `1` under Settings → Environment Variables and
-redeploy. That is the one variable it needs: `NEXT_PUBLIC_API_URL` is not required in demo mode, and
-the build stops with a message if neither is set.
+```bash
+docker compose logs -f web
+```
 
-## Deploy on Vercel
+```bash
+git pull && docker compose up -d --build
+```
 
-Set up the backend on your VPS first (see the backend's [DEPLOY.md](https://github.com/CHEDFOX/IPA-Backend/blob/HEAD/DEPLOY.md)), so the first build has
-your listings.
+```bash
+docker compose exec web npm run backup
+```
 
-1. **Import the project**: vercel.com → Add New → Project → import `CHEDFOX/IPA-Web`.
-   Vercel detects Next.js; leave the build settings as they are.
-2. **Environment variables** (same screen, or later under Settings → Environment Variables):
+Everything that matters — the database and every uploaded photo — is in the `ipa-data` volume.
+Copy it somewhere safe on a schedule; `npm run backup` makes a consistent copy of the database
+while the site keeps serving.
 
-   | Name | Value |
-   | --- | --- |
-   | `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com` (your backend) |
-   | `NEXT_PUBLIC_SITE_URL` | `https://yourdomain.com` (or leave it out until your domain is connected; the `*.vercel.app` address is used meanwhile) |
-   | `REVALIDATE_SECRET` | the same long random string as in the backend's `.env` |
+**Without Docker**: `deploy/ipa-web.service` (systemd) and `deploy/nginx.conf` (nginx + certbot).
+Node 22 and `ffmpeg` need to be installed; `npm ci && npm run build && npm run start`.
 
-3. **Deploy**. The build stops with a clear message if `NEXT_PUBLIC_API_URL` is missing.
-4. **Domain**: Settings → Domains → add `yourdomain.com` (and `www.yourdomain.com`), then create the
-   DNS records Vercel shows you. Keep the `api` record pointing at your VPS.
-5. **Function region**: Settings → Functions → choose the region closest to your VPS, so the site
-   talks to the backend quickly.
-6. **Redeploy** after changing environment variables (Deployments → ⋯ → Redeploy).
+**Sizing**: SQLite and the photos sit on the server's disk, so give it room for the media —
+a few hundred photos is a few GB. Any small VPS handles the traffic.
 
-> **Plan:** Vercel's free Hobby plan is for personal, non-commercial use only. A site promoting a
-> business counts as commercial, so use the **Pro** plan for the live site.
-
-Every push to the production branch (the default branch; see Settings → Git) deploys automatically;
-other branches get preview addresses.
-
-## Run it locally
-
-Start the backend first (see its README), then:
+## Run it on your laptop
 
 ```bash
 npm install
-cp .env.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:4000, NEXT_PUBLIC_SITE_URL=http://localhost:3000
+cp .env.example .env.local     # ADMIN_PASSWORD at least
 npm run dev                    # http://localhost:3000
+npm run seed                   # optional: sample listings, prints their access codes
 ```
 
-Checks: `npm run lint` and `npm run typecheck`. `npm run build && npm start` runs a production
+Checks: `npm run lint`, `npm run typecheck`. `npm run build && npm run start` runs a production
 build locally.
 
-If the backend is unreachable during a build, the build still succeeds: pages start empty and
-fill in within a minute once the backend answers.
+`IPA_DEMO=1 npm run dev` ignores the database and runs the built-in sample listings in
+`lib/demo.ts` instead — handy for showing the site without touching real data. The photos it uses
+are public domain; see `public/demo/CREDITS.txt`.
+
+## Settings (`.env`)
+
+| Variable | What it does |
+| --- | --- |
+| `ADMIN_PASSWORD` | Admin panel password, 10 characters or more. Required. |
+| `SITE_URL` | The site's public address, for link previews, QR codes and the sitemap. |
+| `DOMAIN` | Your domain, used by Caddy to get the certificate. |
+| `IPA_DATA_DIR` | Where the database and photos live. Docker sets this itself. |
+| `IPA_UNLOCK_MINUTES` | How long an unlock lasts after a visitor leaves. Default 10. |
+| `IPA_DEMO` | `1` runs the built-in sample listings instead of the database. |
+
+Built with Next.js 16 (App Router, Cache Components), SQLite and sharp. Public pages are cached
+and refresh the moment you save a change in the admin panel.

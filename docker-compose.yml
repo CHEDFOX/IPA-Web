@@ -1,0 +1,40 @@
+# The site plus Caddy, which gets and renews the HTTPS certificate on its own.
+#
+#   cp .env.example .env && nano .env     # DOMAIN, ADMIN_PASSWORD, NEXT_PUBLIC_SITE_URL
+#   docker compose up -d --build
+#
+# Everything that matters lives in the ipa-data volume: back that up.
+
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Where the database and the uploaded photos live inside the container.
+      IPA_DATA_DIR: /app/data
+      PORT: 3000
+    volumes:
+      - ipa-data:/app/data
+    expose:
+      - '3000'
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    env_file: .env
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  ipa-data:
+  caddy-data:
+  caddy-config:

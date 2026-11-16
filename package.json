@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "seed": "node --conditions=react-server --import tsx scripts/seed.ts"
+    "seed": "node --conditions=react-server --import tsx scripts/seed.ts",
+    "backup": "node --conditions=react-server --import tsx scripts/backup.ts"
   },
   "dependencies": {
     "better-sqlite3": "^13.2.0",

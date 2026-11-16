@@ -7,7 +7,8 @@
 
 import type { Cover, ImageMedia, Property, PropertyCard, Site, VideoMedia } from './types';
 
-export const DEMO = process.env.NEXT_PUBLIC_DEMO === '1';
+// IPA_DEMO is read at run time; NEXT_PUBLIC_DEMO is baked in at build time.
+export const DEMO = process.env.IPA_DEMO === '1' || process.env.NEXT_PUBLIC_DEMO === '1';
 
 /** Widths generated for each photo by the build script, in order. */
 type Widths = readonly number[];

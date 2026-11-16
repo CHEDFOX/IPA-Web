@@ -1,10 +1,10 @@
 import type { NextConfig } from 'next';
 
-// Without the backend address a Vercel deploy would succeed but show no listings, so stop early.
-// Demo mode (NEXT_PUBLIC_DEMO=1) has no backend to point at, so it is allowed through.
-if (process.env.VERCEL && !process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_DEMO !== '1') {
+// The site keeps its own database, so a Vercel deploy would have nothing to read and no
+// writable disk for uploads. Say so at build time rather than shipping an empty site.
+if (process.env.VERCEL && process.env.NEXT_PUBLIC_DEMO !== '1') {
   throw new Error(
-    'NEXT_PUBLIC_API_URL is not set. Add it in Vercel → Project → Settings → Environment Variables, e.g. https://api.yourdomain.com — or set NEXT_PUBLIC_DEMO=1 to deploy the sample listings instead.',
+    'This app stores listings and uploaded photos on disk, so it needs a normal server (see README: Put it on your server). To deploy the sample listings to Vercel anyway, set NEXT_PUBLIC_DEMO=1.',
   );
 }
 

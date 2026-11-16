@@ -1,0 +1,34 @@
+# Caddy fetches and renews the HTTPS certificate by itself; point the domain's A record
+# at this server first, or the certificate cannot be issued.
+#
+# DOMAIN comes from .env, e.g. DOMAIN=yourdomain.com
+
+{$DOMAIN}, www.{$DOMAIN} {
+	encode zstd gzip
+
+	# Uploaded photos and video. Locked files are already marked private by the app,
+	# so this only adds compression-free streaming for the big ones.
+	@media path /media/*
+	header @media Cross-Origin-Resource-Policy cross-origin
+
+	# The admin panel is not for search engines or other sites' frames.
+	@admin path /admin /admin/*
+	header @admin {
+		X-Frame-Options DENY
+		X-Robots-Tag "noindex, nofollow"
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	# Uploads go through here, so allow a large body.
+	request_body {
+		max_size 1GB
+	}
+
+	reverse_proxy web:3000
+}
