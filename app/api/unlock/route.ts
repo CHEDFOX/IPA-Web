@@ -65,6 +65,9 @@ export async function GET(request: NextRequest) {
 }
 
 export function cookie(name: string, value: string, maxAgeSeconds: number, request: NextRequest): string {
-  const secure = request.nextUrl.protocol === 'https:' ? '; Secure' : '';
-  return `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; HttpOnly; SameSite=Lax${secure}`;
+  // Behind nginx or Caddy the request reaches us over plain http, so the proxy's header is
+  // what says whether the visitor is on https.
+  const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim();
+  const https = forwarded ? forwarded === 'https' : request.nextUrl.protocol === 'https:';
+  return `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; HttpOnly; SameSite=Lax${https ? '; Secure' : ''}`;
 }

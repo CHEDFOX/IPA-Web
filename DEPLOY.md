@@ -9,6 +9,13 @@ Roughly 20 minutes, most of it waiting for DNS.
 
 ---
 
+## If the server already runs other sites
+
+The installer handles it. When nginx or Apache already holds ports 80 and 443, it leaves them
+alone, puts the site on the first free local port, and writes `deploy/nginx-site.conf` with your
+domain and port filled in — enable that file and run certbot, as the installer prints. Caddy is
+only started on a server with nothing on 80/443.
+
 ## 1. Get a server
 
 Any small Linux box will do. The site is light; the photos are what take room.

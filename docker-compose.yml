@@ -16,13 +16,17 @@ services:
       PORT: 3000
     volumes:
       - ipa-data:/app/data
-    # Only reachable from the server itself, so the site can be checked before the domain
-    # is pointed here. Caddy reaches it over the compose network.
+    # Only reachable from the server itself: a proxy in front publishes it. IPA_PORT lets it
+    # move out of the way of anything already using 3000 on this machine.
     ports:
-      - '127.0.0.1:3000:3000'
+      - '127.0.0.1:${IPA_PORT:-3000}:3000'
 
+  # Only for a server with nothing else on ports 80 and 443. Start it with
+  #   docker compose --profile caddy up -d
+  # On a machine that already runs nginx or Apache, leave it off and proxy to IPA_PORT.
   caddy:
     image: caddy:2-alpine
+    profiles: ['caddy']
     restart: unless-stopped
     depends_on:
       - web

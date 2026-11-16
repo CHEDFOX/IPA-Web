@@ -1,5 +1,5 @@
 import 'server-only';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { getDb } from './db';
 import { randomToken, sha256, timingSafeEqual } from './util';
 
@@ -21,6 +21,12 @@ export function passwordMatches(input: string): boolean {
   return timingSafeEqual(String(input ?? ''), expected);
 }
 
+/** True when the visitor is on https, even if a proxy in front terminated it. */
+async function overHttps(): Promise<boolean> {
+  const forwarded = (await headers()).get('x-forwarded-proto')?.split(',')[0].trim();
+  return forwarded ? forwarded === 'https' : process.env.NODE_ENV === 'production';
+}
+
 export async function startAdminSession() {
   const db = getDb();
   db.prepare('DELETE FROM admin_sessions WHERE expires_at <= ?').run(Date.now());
@@ -31,7 +37,7 @@ export async function startAdminSession() {
   jar.set(ADMIN_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: await overHttps(),
     path: '/',
     maxAge: SESSION_DAYS * 86_400,
   });
