@@ -2,10 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { fill, type Dictionary, type Locale } from '@/lib/i18n';
-import type { UnlockedDetail } from '@/lib/types';
+import type { Cover, UnlockedDetail } from '@/lib/types';
 import { Gallery, ZoomImage } from './Gallery';
 import { Chat, Lock, Photos, Pin } from './Icons';
 import { LocationMap } from './LocationMap';
+import { Picture } from './Picture';
 
 interface GateConfig {
   /** Public listings unlock by slug; a private link passes its token instead. */
@@ -20,6 +21,8 @@ interface GateConfig {
   /** WhatsApp link for "ask for a code", already carrying the site's one number. */
   whatsapp: string;
   helpText?: string;
+  /** The one photo shown before unlocking. */
+  cover?: Cover | null;
 }
 
 type Phase = 'locked' | 'open' | 'expired';
@@ -153,7 +156,7 @@ const useGate = () => useContext(GateContext);
 export function GateGallery() {
   const gate = useGate();
   if (!gate) return null;
-  const { t, detail, phase, photoCount, videoCount, title, openDialog } = gate;
+  const { t, detail, phase, photoCount, videoCount, title, openDialog, cover } = gate;
   const labels = t.unlock;
   const total = photoCount + videoCount;
 
@@ -177,16 +180,27 @@ export function GateGallery() {
           {labels.expired}
         </p>
       )}
-      <button type="button" className="locked-panel locked-gallery" onClick={openDialog}>
-        <span className="locked-icon">
-          <Lock size={22} />
+      <button
+        type="button"
+        className={cover ? 'locked-panel locked-gallery has-cover' : 'locked-panel locked-gallery'}
+        onClick={openDialog}
+      >
+        {cover && (
+          <span className="locked-cover" aria-hidden="true">
+            <Picture image={cover} alt="" sizes="(max-width: 860px) 100vw, 1100px" priority />
+          </span>
+        )}
+        <span className="locked-inner">
+          <span className="locked-icon">
+            <Lock size={22} />
+          </span>
+          <strong>{labels.photosTitle}</strong>
+          <span className="muted">{total > 1 ? fill(labels.photosText, { n: total - 1 }) : labels.photosTextNoCount}</span>
+          <span className="btn btn-dark btn-sm locked-cta">{labels.button}</span>
         </span>
-        <strong>{labels.photosTitle}</strong>
-        <span className="muted">{total > 0 ? fill(labels.photosText, { n: total }) : labels.photosTextNoCount}</span>
-        <span className="btn btn-dark btn-sm locked-cta">{labels.button}</span>
-        {total > 0 && (
+        {total > 1 && (
           <span className="media-chip right">
-            <Photos /> {total}
+            <Photos /> {total - 1}
           </span>
         )}
       </button>

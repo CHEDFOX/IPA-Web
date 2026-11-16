@@ -281,6 +281,7 @@ export function PropertyView({
       videoCount={p.videoCount ?? 0}
       whatsapp={wa}
       helpText={settings.unlockHelpText || undefined}
+      cover={p.cover}
     >
       {body}
     </GateProvider>

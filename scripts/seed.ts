@@ -9,11 +9,11 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getDb } from '../lib/server/db.ts';
-import { storeUpload, type MediaRole } from '../lib/server/media.ts';
-import { activeCode } from '../lib/server/access.ts';
-import { createProperty, createRegion, listAllProperties, setCover } from '../lib/server/repo.ts';
-import { writeSettings } from '../lib/server/settings.ts';
+import { getDb } from '../lib/server/db';
+import { storeUpload, type MediaRole } from '../lib/server/media';
+import { activeCode } from '../lib/server/access';
+import { createProperty, createRegion, listAllProperties, setCover } from '../lib/server/repo';
+import { writeSettings } from '../lib/server/settings';
 
 const DEMO_DIR = path.join(process.cwd(), 'public', 'demo');
 

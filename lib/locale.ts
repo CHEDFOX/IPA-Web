@@ -4,8 +4,9 @@ import { DICTIONARIES, isLocale, type Locale } from './i18n';
 
 /** The language of the current page, from the /[lang] segment (server components only). */
 export async function getLocale(): Promise<Locale> {
+  // Undefined outside app/[lang] (the admin panel has no language segment).
   const value = await lang();
-  if (!isLocale(value)) notFound();
+  if (!value || !isLocale(value)) notFound();
   return value;
 }
 
