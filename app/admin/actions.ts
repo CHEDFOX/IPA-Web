@@ -1,9 +1,9 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { refresh, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { CACHE_TAG } from '@/lib/api';
-import { markAccessRequest, revokeUnlocks, rotateCode, setCodeUses } from '@/lib/server/access';
+import { markAccessRequest, replaceAllCodes, replaceCode, revokeUnlocks, setPoolUses } from '@/lib/server/access';
 import { endAdminSession, passwordMatches, requireAdmin, startAdminSession } from '@/lib/server/auth';
 import { getDb } from '@/lib/server/db';
 import { resolvePoint } from '@/lib/server/maplink';
@@ -24,9 +24,18 @@ import {
 import { writeSettings, type SettingKey } from '@/lib/server/settings';
 import { clampInt, text, toInt, toNumber } from '@/lib/server/util';
 
-/** Every edit drops the cached pages, so the website shows the change at once. */
+/** Every edit drops the cached public pages, so the website shows the change at once. */
 function published() {
   revalidateTag(CACHE_TAG, { expire: 0 });
+  refresh();
+}
+
+/**
+ * For edits the website never sees (codes, call-backs, read flags): redraw the panel so the
+ * person who clicked sees the result without reloading.
+ */
+function redrawPanel() {
+  refresh();
 }
 
 export type ActionState = { error?: string; ok?: string } | undefined;
@@ -239,23 +248,34 @@ export async function saveMediaAlt(form: FormData) {
 
 // ---------- access codes
 
+/** Retires one waiting code and mints another in its place. */
 export async function newCode(form: FormData) {
   await requireAdmin();
+  const codeId = toInt(form.get('codeId'));
+  if (codeId) replaceCode(codeId);
+  redrawPanel();
+}
+
+/** Retires every waiting code for a property and mints a fresh set. */
+export async function replaceCodes(form: FormData) {
+  await requireAdmin();
   const propertyId = toInt(form.get('propertyId'));
-  if (propertyId) rotateCode(propertyId, clampInt(form.get('maxUses'), 1, 50, 1));
-  published();
+  if (propertyId) replaceAllCodes(propertyId, clampInt(form.get('maxUses'), 1, 50, 1));
+  redrawPanel();
 }
 
 export async function changeCodeUses(form: FormData) {
   await requireAdmin();
-  const codeId = toInt(form.get('codeId'));
-  if (codeId) setCodeUses(codeId, clampInt(form.get('maxUses'), 1, 50, 1));
+  const propertyId = toInt(form.get('propertyId'));
+  if (propertyId) setPoolUses(propertyId, clampInt(form.get('maxUses'), 1, 50, 1));
+  redrawPanel();
 }
 
 export async function closeUnlocks(form: FormData) {
   await requireAdmin();
   const propertyId = toInt(form.get('propertyId'));
   if (propertyId) revokeUnlocks(propertyId);
+  redrawPanel();
 }
 
 // ---------- requests and enquiries
@@ -267,18 +287,21 @@ export async function updateRequest(form: FormData) {
   if (id && (state === 'new' || state === 'sent' || state === 'closed')) {
     markAccessRequest(id, state, text(form.get('sentCode'), 20));
   }
+  redrawPanel();
 }
 
 export async function markEnquiryRead(form: FormData) {
   await requireAdmin();
   const id = toInt(form.get('id'));
   if (id) getDb().prepare('UPDATE enquiries SET is_read = 1 WHERE id = ?').run(id);
+  redrawPanel();
 }
 
 export async function removeEnquiry(form: FormData) {
   await requireAdmin();
   const id = toInt(form.get('id'));
   if (id) getDb().prepare('DELETE FROM enquiries WHERE id = ?').run(id);
+  redrawPanel();
 }
 
 /** Rebuilds the public pages now — useful after restoring a backup into the data folder. */

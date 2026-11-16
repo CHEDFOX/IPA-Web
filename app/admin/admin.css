@@ -169,3 +169,13 @@
 .admin-fieldset > button, .admin-fieldset > .admin-btn { align-self: flex-start; }
 .admin-code-row > div { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .admin-refresh { margin: 4px 0 18px; }
+
+/* the pool of waiting codes */
+.admin-code-pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin: 12px 0; padding: 0; list-style: none; }
+.admin-code-pool li {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--paper);
+}
+.admin-code-pool li .admin-code { flex: 1; text-align: center; }
+.admin-code-tools { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.admin-subhead { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 22px 0 0; }

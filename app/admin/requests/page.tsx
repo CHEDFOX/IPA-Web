@@ -1,4 +1,4 @@
-import { activeCode, listAccessRequests } from '@/lib/server/access';
+import { listAccessRequests, nextCode } from '@/lib/server/access';
 import { getProperty } from '@/lib/server/repo';
 import { readSettings } from '@/lib/server/settings';
 import { updateRequest } from '../actions';
@@ -18,6 +18,8 @@ export default async function RequestsPage() {
   if (!(await isSignedIn())) return null;
   const requests = listAccessRequests();
   const settings = readSettings();
+  // Codes already promised to someone, so two callers never get the same one.
+  const promised = requests.filter((r) => r.sent_code).map((r) => r.sent_code);
 
   return (
     <>
@@ -41,7 +43,13 @@ export default async function RequestsPage() {
         <tbody>
           {requests.map((request) => {
             const property = request.property_id ? getProperty(request.property_id) : null;
-            const code = property?.gated ? activeCode(property.id) : null;
+            // A request that has already been answered keeps showing the code it was sent.
+            const code = request.sent_code
+              ? { code: request.sent_code }
+              : property?.gated
+                ? nextCode(property.id, promised)
+                : null;
+            if (code && !request.sent_code) promised.push(code.code);
             const message = property
               ? `Hello${request.name ? ` ${request.name}` : ''}, here is your access code for ${property.title}: ${code?.code ?? ''}`
               : '';

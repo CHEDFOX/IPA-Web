@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { activeCode, countNewAccessRequests, listAccessRequests } from '@/lib/server/access';
+import { CODE_POOL, activeCodes, countNewAccessRequests, listAccessRequests } from '@/lib/server/access';
 import { getDb } from '@/lib/server/db';
 import { listAllProperties, listRegions } from '@/lib/server/repo';
 import { readSettings } from '@/lib/server/settings';
@@ -57,32 +57,30 @@ export default async function AdminHome() {
           </Link>
         </div>
         <p className="admin-muted">
-          Each gated property has one code waiting. Give it to a visitor; the moment they use it, it stops working and the
-          next one appears here.
+          Each gated property keeps {CODE_POOL} codes ready. Give one out; the moment it is used it stops working and
+          another takes its place, so the pool never runs down.
         </p>
         <table className="admin-table">
           <thead>
             <tr>
               <th>Property</th>
-              <th>Code</th>
-              <th>Uses</th>
+              <th>Next code to give</th>
+              <th>Ready</th>
               <th />
             </tr>
           </thead>
           <tbody>
             {gated.map((property) => {
-              const code = activeCode(property.id);
+              const pool = activeCodes(property.id);
               return (
                 <tr key={property.id}>
                   <td>
                     <Link href={`/admin/properties/${property.id}`}>{property.title}</Link>
                   </td>
                   <td>
-                    <code className="admin-code">{code.code}</code>
+                    <code className="admin-code">{pool[0]?.code ?? '—'}</code>
                   </td>
-                  <td className="admin-muted">
-                    {code.used_count} / {code.max_uses}
-                  </td>
+                  <td className="admin-muted">{pool.length}</td>
                   <td className="admin-right">
                     <Link className="admin-link" href={`/admin/properties/${property.id}#codes`}>
                       Codes

@@ -38,36 +38,72 @@ function insertCode(propertyId: number, maxUses: number, note = ''): CodeRow {
   return db.prepare('SELECT * FROM codes WHERE id = ?').get(Number(info.lastInsertRowid)) as CodeRow;
 }
 
-/** The code the panel shows for a listing. One is minted the first time it is asked for. */
-export function activeCode(propertyId: number, maxUses = 1): CodeRow {
+/**
+ * How many codes stand ready for each property. The pool is refilled as codes are spent,
+ * so the panel always shows this many that nobody has used.
+ */
+export const CODE_POOL = Math.min(50, Math.max(1, Number(process.env.IPA_CODE_POOL || 10)));
+
+const activeRows = (propertyId: number) =>
+  getDb()
+    .prepare("SELECT * FROM codes WHERE property_id = ? AND state = 'active' ORDER BY id")
+    .all(propertyId) as CodeRow[];
+
+/** Mints codes until the pool is full again. Returns the full pool, oldest first. */
+export function ensureCodePool(propertyId: number, maxUses = 1): CodeRow[] {
   const db = getDb();
-  const row = db
-    .prepare("SELECT * FROM codes WHERE property_id = ? AND state = 'active' ORDER BY id DESC LIMIT 1")
-    .get(propertyId) as CodeRow | undefined;
-  return row ?? insertCode(propertyId, maxUses);
+  return db.transaction(() => {
+    let rows = activeRows(propertyId);
+    const uses = rows[0]?.max_uses ?? maxUses;
+    for (let i = rows.length; i < CODE_POOL; i++) insertCode(propertyId, uses);
+    if (rows.length < CODE_POOL) rows = activeRows(propertyId);
+    return rows;
+  })();
 }
 
-export function listCodes(propertyId: number, limit = 20): CodeRow[] {
+/** The codes the panel shows for a listing: ten of them, all unused. */
+export function activeCodes(propertyId: number, maxUses = 1): CodeRow[] {
+  return ensureCodePool(propertyId, maxUses);
+}
+
+/** The single code to hand to one caller: the oldest one not already promised to someone. */
+export function nextCode(propertyId: number, exclude: string[] = []): CodeRow | null {
+  const pool = ensureCodePool(propertyId);
+  return pool.find((row) => !exclude.includes(row.code)) ?? pool[0] ?? null;
+}
+
+export function listCodes(propertyId: number, limit = 40): CodeRow[] {
   return getDb()
     .prepare('SELECT * FROM codes WHERE property_id = ? ORDER BY id DESC LIMIT ?')
     .all(propertyId, limit) as CodeRow[];
 }
 
-/** Retires the current code and puts a fresh one in its place. */
-export function rotateCode(propertyId: number, maxUses?: number): CodeRow {
+/** Retires one code — it stops working at once — and refills the pool behind it. */
+export function replaceCode(codeId: number): CodeRow[] {
   const db = getDb();
   return db.transaction(() => {
-    const current = db
-      .prepare("SELECT * FROM codes WHERE property_id = ? AND state = 'active' ORDER BY id DESC LIMIT 1")
-      .get(propertyId) as CodeRow | undefined;
-    if (current) db.prepare("UPDATE codes SET state = 'revoked' WHERE id = ?").run(current.id);
-    return insertCode(propertyId, maxUses ?? current?.max_uses ?? 1);
+    const row = db.prepare('SELECT * FROM codes WHERE id = ?').get(codeId) as CodeRow | undefined;
+    if (!row) return [];
+    db.prepare("UPDATE codes SET state = 'revoked' WHERE id = ?").run(row.id);
+    return ensureCodePool(row.property_id, row.max_uses);
   })();
 }
 
-/** Changes how many visitors one code may admit, without changing the code itself. */
-export function setCodeUses(codeId: number, maxUses: number) {
-  getDb().prepare("UPDATE codes SET max_uses = ? WHERE id = ? AND state = 'active'").run(Math.max(1, maxUses), codeId);
+/** Retires every waiting code for a property and mints a whole new set. */
+export function replaceAllCodes(propertyId: number, maxUses?: number): CodeRow[] {
+  const db = getDb();
+  return db.transaction(() => {
+    const current = activeRows(propertyId);
+    db.prepare("UPDATE codes SET state = 'revoked' WHERE property_id = ? AND state = 'active'").run(propertyId);
+    return ensureCodePool(propertyId, maxUses ?? current[0]?.max_uses ?? 1);
+  })();
+}
+
+/** Changes how many visitors each waiting code may admit. */
+export function setPoolUses(propertyId: number, maxUses: number) {
+  getDb()
+    .prepare("UPDATE codes SET max_uses = ? WHERE property_id = ? AND state = 'active'")
+    .run(Math.max(1, maxUses), propertyId);
 }
 
 export type RedeemResult =
@@ -76,8 +112,8 @@ export type RedeemResult =
 
 /**
  * Checks a code against one listing and, if it is good, spends a use and opens a session.
- * The last use retires the code and mints its replacement, so the panel always shows a code
- * that nobody has had yet.
+ * The last use retires that code and mints a replacement, so the pool of waiting codes
+ * always holds the same number that nobody has used.
  */
 export function redeemCode(propertyId: number, input: string, userAgent = ''): RedeemResult {
   const db = getDb();

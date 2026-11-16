@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { activeCode } from '@/lib/server/access';
+import { activeCodes } from '@/lib/server/access';
 import { coversFor, listAllProperties } from '@/lib/server/repo';
 import { connection } from 'next/server';
 import { isSignedIn } from '@/lib/server/auth';
@@ -41,7 +41,7 @@ export default async function PropertiesPage() {
           {properties.map((property) => {
             const media = covers.get(property.id) ?? [];
             const cover = media.find((m) => m.role === 'cover') ?? media[0];
-            const code = property.gated ? activeCode(property.id) : null;
+            const pool = property.gated ? activeCodes(property.id) : [];
             return (
               <tr key={property.id}>
                 <td className="admin-thumb-cell">
@@ -64,7 +64,14 @@ export default async function PropertiesPage() {
                 </td>
                 <td className="admin-muted">{media.length}</td>
                 <td>
-                  {code ? <code className="admin-code">{code.code}</code> : <span className="admin-muted">open</span>}
+                  {pool.length ? (
+                    <>
+                      <code className="admin-code">{pool[0].code}</code>
+                      <div className="admin-muted">{pool.length} ready</div>
+                    </>
+                  ) : (
+                    <span className="admin-muted">open</span>
+                  )}
                 </td>
               </tr>
             );

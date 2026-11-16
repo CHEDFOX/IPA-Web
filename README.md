@@ -24,9 +24,12 @@ domain.
 
 ## How the access codes work
 
-- Every gated property has **one code waiting** in the admin panel. Give it to a visitor.
+- Every gated property keeps **ten codes waiting** in the admin panel. Give one to a visitor.
 - A code dies when its uses run out (**one use by default**, and you can set more per code).
-  The moment it does, a fresh code appears in the panel, so you never hand out the same one twice.
+  The moment it does, another takes its place, so there are always ten nobody has used and you
+  never hand out the same one twice.
+- Hand out as many as you like in a day: the pool refills itself. You can also retire a single
+  code, or replace the whole set, from the property's page.
 - Entering a code opens that property for **ten minutes**. The clock restarts while the visitor
   is on the site, so reading for an hour is fine. Closing the tab and coming back within ten
   minutes still works; leaving for longer does not.
@@ -45,7 +48,7 @@ everything to everyone.
 
 | Page | What you do there |
 | --- | --- |
-| Overview | What is live, who is waiting for a code, and every property's current code |
+| Overview | What is live, who is waiting for a code, and the next code to give for each property |
 | Properties | Add and edit listings; photos, video, site plan, brochure; access codes |
 | Regions | The list of places listings are filed under, and the only part of a location shown before unlocking |
 | Code requests | People who asked for a code, with a WhatsApp link to send them one |
@@ -126,6 +129,7 @@ are public domain; see `public/demo/CREDITS.txt`.
 | `DOMAIN` | Your domain, used by Caddy to get the certificate. |
 | `IPA_DATA_DIR` | Where the database and photos live. Docker sets this itself. |
 | `IPA_UNLOCK_MINUTES` | How long an unlock lasts after a visitor leaves. Default 10. |
+| `IPA_CODE_POOL` | How many codes stand ready per property. Default 10. |
 | `IPA_DEMO` | `1` runs the built-in sample listings instead of the database. |
 
 Built with Next.js 16 (App Router, Cache Components), SQLite and sharp. Public pages are cached

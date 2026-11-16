@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { activeCode, activeUnlockCount, listCodes } from '@/lib/server/access';
+import { CODE_POOL, activeCodes, activeUnlockCount, listCodes } from '@/lib/server/access';
 import { getProperty, listRegions, mediaOf } from '@/lib/server/repo';
-import { closeUnlocks, makeCover, moveMedia, newCode, removeMedia, removeProperty, saveMediaAlt } from '../../actions';
+import { changeCodeUses, closeUnlocks, makeCover, moveMedia, newCode, removeMedia, removeProperty, replaceCodes, saveMediaAlt } from '../../actions';
 import { PropertyForm, type PropertyFormValues } from '../PropertyForm';
 import { UploadForm } from './UploadForm';
 import { connection } from 'next/server';
@@ -23,9 +23,10 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
   const gallery = media.filter((m) => m.role === 'cover' || m.role === 'gallery');
   const plan = media.find((m) => m.role === 'plan');
   const brochure = media.find((m) => m.role === 'brochure');
-  // Reading the page is what mints a listing's first code.
-  const active = property.gated ? activeCode(property.id) : null;
-  const codes = listCodes(property.id);
+  // Reading the page is what fills a listing's pool for the first time.
+  const pool = property.gated ? activeCodes(property.id) : [];
+  const spent = listCodes(property.id, 60).filter((c) => c.state !== 'active');
+  const uses = pool[0]?.max_uses ?? 1;
   const open = activeUnlockCount(property.id);
 
   return (
@@ -53,27 +54,55 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
           <>
             <div className="admin-code-row">
               <div>
-                <span className="admin-muted">Give this code to a visitor</span>
-                <div className="admin-code big">{active?.code ?? '—'}</div>
                 <span className="admin-muted">
-                  {active ? `${active.used_count} of ${active.max_uses} use${active.max_uses === 1 ? '' : 's'} spent` : ''}
+                  {pool.length} code{pool.length === 1 ? '' : 's'} ready to give out
                   {open > 0 && ` · ${open} visitor${open === 1 ? '' : 's'} inside right now`}
                 </span>
               </div>
-              <form action={newCode} className="admin-inline-form">
-                <input type="hidden" name="propertyId" value={property.id} />
-                <label className="narrow">
-                  <span>Uses per code</span>
-                  <input name="maxUses" type="number" min={1} max={50} defaultValue={active?.max_uses ?? 1} />
-                </label>
-                <button className="admin-btn" type="submit">
-                  Replace code
-                </button>
-              </form>
+              <div className="admin-code-tools">
+                <form action={changeCodeUses} className="admin-inline-form">
+                  <input type="hidden" name="propertyId" value={property.id} />
+                  <label className="narrow">
+                    <span>Uses per code</span>
+                    <input name="maxUses" type="number" min={1} max={50} defaultValue={uses} />
+                  </label>
+                  <button className="admin-btn small" type="submit">
+                    Apply
+                  </button>
+                </form>
+                <form action={replaceCodes} className="admin-inline-form">
+                  <input type="hidden" name="propertyId" value={property.id} />
+                  <input type="hidden" name="maxUses" value={uses} />
+                  <button className="admin-btn small" type="submit">
+                    Replace all {CODE_POOL}
+                  </button>
+                </form>
+              </div>
             </div>
+
+            <ul className="admin-code-pool">
+              {pool.map((code) => (
+                <li key={code.id}>
+                  <code className="admin-code">{code.code}</code>
+                  {code.max_uses > 1 && (
+                    <span className="admin-muted">
+                      {code.used_count}/{code.max_uses}
+                    </span>
+                  )}
+                  <form action={newCode}>
+                    <input type="hidden" name="codeId" value={code.id} />
+                    <button className="admin-btn small" type="submit" title="Retire this code and mint another">
+                      Replace
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+
             <p className="admin-muted">
-              A code stops working the moment its uses run out, and the next one appears here straight away. Visitors
-              already inside keep access for ten minutes after they leave the site.
+              Hand these out one at a time. A code stops working as soon as its uses run out, and a new one takes its
+              place here, so there are always {CODE_POOL} nobody has used. Visitors already inside keep access for ten
+              minutes after they leave the site.
             </p>
             {open > 0 && (
               <form action={closeUnlocks}>
@@ -83,6 +112,8 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
                 </button>
               </form>
             )}
+
+            <h3 className="admin-subhead">Used and replaced</h3>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -94,7 +125,7 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
                 </tr>
               </thead>
               <tbody>
-                {codes.map((code) => (
+                {spent.map((code) => (
                   <tr key={code.id}>
                     <td>
                       <code className="admin-code">{code.code}</code>
@@ -109,6 +140,13 @@ export default async function EditPropertyPage({ params }: PageProps<'/admin/pro
                     <td className="admin-muted">{code.last_used_at ? new Date(code.last_used_at).toLocaleString('en-IN') : '—'}</td>
                   </tr>
                 ))}
+                {!spent.length && (
+                  <tr>
+                    <td colSpan={5} className="admin-muted">
+                      Nothing used yet.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </>

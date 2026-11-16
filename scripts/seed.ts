@@ -11,7 +11,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getDb } from '../lib/server/db';
 import { storeUpload, type MediaRole } from '../lib/server/media';
-import { activeCode } from '../lib/server/access';
+import { activeCodes } from '../lib/server/access';
 import { createProperty, createRegion, listAllProperties, setCover } from '../lib/server/repo';
 import { writeSettings } from '../lib/server/settings';
 
@@ -160,8 +160,8 @@ async function main() {
   }
 
   for (const property of listAllProperties()) {
-    const code = activeCode(property.id);
-    console.log(`  ${property.slug.padEnd(42)} code ${code.code}`);
+    const pool = activeCodes(property.id);
+    console.log(`  ${property.slug.padEnd(42)} ${pool.length} codes, first: ${pool[0]?.code ?? '—'}`);
   }
   console.log(`\nSeeded ${listAllProperties().length} listings. Database: ${db.name}`);
 }

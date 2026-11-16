@@ -1,4 +1,4 @@
-import { UNLOCK_MINUTES } from '@/lib/server/access';
+import { CODE_POOL, UNLOCK_MINUTES } from '@/lib/server/access';
 import { siteMedia } from '@/lib/server/repo';
 import { readSettings } from '@/lib/server/settings';
 import { SettingsForm, SiteImageForm } from './SettingsForm';
@@ -43,14 +43,17 @@ export default async function SettingsPage() {
       <section className="admin-section">
         <h2>How access works</h2>
         <ul className="admin-list">
-          <li>Each gated property has one access code waiting in its page.</li>
+          <li>
+            Each gated property keeps <strong>{CODE_POOL} access codes</strong> ready on its page, all unused.
+          </li>
           <li>A code stops working once its uses are spent, and a fresh one takes its place at once.</li>
           <li>
             An unlock lasts <strong>{UNLOCK_MINUTES} minutes</strong>, and the clock restarts while the visitor is on
             the site. Closing the tab and coming back within that time still works; leaving for longer does not.
           </li>
           <li>
-            To change the length, set <code>IPA_UNLOCK_MINUTES</code> in the server&rsquo;s environment and restart.
+            To change the length, set <code>IPA_UNLOCK_MINUTES</code> in the server&rsquo;s environment and restart;
+            <code>IPA_CODE_POOL</code> changes how many codes stand ready.
           </li>
         </ul>
       </section>
